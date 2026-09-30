@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Boxes, Sparkles, Filter } from 'lucide-react';
 import { MINECRAFT_BLOCKS } from '../../lib/registry.ts';
 import { BlockCategory } from '../../types/minecraft.ts';
+import { getBlockIconDataUrl } from '../../lib/textureGenerator.ts';
 
 interface BlockPaletteSelectorProps {
   selectedBlockId: string;
@@ -52,10 +53,14 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
       {activeBlock && (
         <div className="p-3 border-b border-slate-800 bg-slate-950/40">
           <div className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded border border-white/20 shadow-inner shrink-0"
-              style={{ backgroundColor: activeBlock.colorHex, opacity: activeBlock.opacity ?? 1 }}
-            />
+            <div className="w-8 h-8 rounded border border-white/20 shadow-inner shrink-0 bg-slate-900 overflow-hidden flex items-center justify-center">
+              <img
+                src={getBlockIconDataUrl(activeBlock.id)}
+                alt={activeBlock.name}
+                className="w-8 h-8 object-contain"
+                style={{ imageRendering: 'pixelated' }}
+              />
+            </div>
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-xs font-bold text-slate-100 truncate">
                 {activeBlock.name}
@@ -119,16 +124,14 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
               }`}
               title={`${block.name}\n${block.id}`}
             >
-              <div
-                className="w-8 h-8 rounded-md shadow-inner mb-1 flex items-center justify-center"
-                style={{
-                  backgroundColor: block.colorHex,
-                  opacity: block.opacity ?? 1,
-                }}
-              >
-                {block.transparent && (
-                  <div className="w-2 h-2 border border-white/40 rounded-full" />
-                )}
+              <div className="w-9 h-9 rounded-md bg-slate-900/90 border border-slate-700/60 shadow-inner mb-1 flex items-center justify-center overflow-hidden p-0.5 group-hover:scale-105 transition-transform">
+                <img
+                  src={getBlockIconDataUrl(block.id)}
+                  alt={block.name}
+                  className="w-8 h-8 object-contain"
+                  style={{ imageRendering: 'pixelated' }}
+                  loading="lazy"
+                />
               </div>
               <span className="text-[9px] text-slate-300 font-medium truncate w-full text-center leading-tight">
                 {block.name.replace('Minecraft ', '')}

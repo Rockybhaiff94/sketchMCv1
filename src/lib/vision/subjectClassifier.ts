@@ -84,18 +84,7 @@ export function classifyAndDecomposeSubject(
     !isAnimalOrCreature &&
     !isVehicle &&
     !isPlantOrTree &&
-    !isStatue &&
-    (nameLower.includes('glass') ||
-      nameLower.includes('garden') ||
-      nameLower.includes('conservatory') ||
-      nameLower.includes('house') ||
-      nameLower.includes('building') ||
-      nameLower.includes('castle') ||
-      nameLower.includes('tower') ||
-      nameLower.includes('pavilion') ||
-      nameLower.includes('church') ||
-      nameLower.includes('cottage') ||
-      nameLower.includes('villa'));
+    !isStatue;
 
   // =========================================================================
   // ARCHETYPE A: APPA / FLYING BISON (Specific high-fidelity creature decomposition)

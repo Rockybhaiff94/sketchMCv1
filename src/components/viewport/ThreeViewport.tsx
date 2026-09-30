@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { BlockPlacement, MinecraftBuild } from '../../types/minecraft.ts';
 import { getMinecraftBlock } from '../../lib/registry.ts';
 import { getBlockGeometry } from '../../lib/models/blockModelRegistry.ts';
+import { getOrCreateBlockTexture } from '../../lib/textureGenerator.ts';
 import { OrientationGizmo, GizmoViewTarget } from './OrientationGizmo.tsx';
 import {
   Focus,
@@ -596,13 +597,24 @@ export const ThreeViewport: React.FC<ThreeViewportProps> = ({
           depthWrite: true,
         });
       } else {
-        const color = new THREE.Color(def?.colorHex || '#808080');
+        const texture = getOrCreateBlockTexture(group.blockId, def?.colorHex);
+        const cleanId = group.blockId.replace('minecraft:', '').toLowerCase();
+        const isGlass = cleanId.includes('glass');
+        const isLeaves = cleanId.includes('leaves') || cleanId.includes('vine');
+        const isPlant = shapeType === 'plant' || shapeType === 'torch';
+        const isDoor = cleanId.includes('door') || cleanId.includes('grate');
+        const isTransparent = isGlass || isLeaves || isPlant || isDoor || !!def?.transparent;
+
         mat = new THREE.MeshStandardMaterial({
-          color,
-          roughness: def?.roughness ?? 0.75,
-          metalness: def?.metalness ?? 0.08,
-          transparent: !!def?.transparent,
-          opacity: def?.opacity ?? 1.0,
+          map: texture,
+          color: new THREE.Color(isPlant || isLeaves || isGlass ? '#ffffff' : (def?.colorHex || '#ffffff')),
+          roughness: isGlass ? 0.05 : (def?.roughness ?? 0.8),
+          metalness: isGlass ? 0.1 : (def?.metalness ?? 0.05),
+          transparent: isTransparent,
+          opacity: isGlass ? (cleanId.includes('tinted') ? 0.75 : 0.55) : 1.0,
+          alphaTest: (isPlant || isLeaves || isDoor) ? 0.25 : 0,
+          side: isPlant ? THREE.DoubleSide : THREE.FrontSide,
+          depthWrite: !isGlass,
         });
       }
 
