@@ -1,5 +1,7 @@
 import { SceneAnalysis, MinecraftBuild } from '../types/minecraft.ts';
 import { voxelizeSceneAnalysis } from './voxelizer.ts';
+import { analyzeReferenceArchitecture } from './vision/architecturalAnalyzer.ts';
+import { buildMinecraftFromProxy } from './reconstruction/proxyBuilder.ts';
 
 export interface PresetBuilding {
   id: string;
@@ -13,6 +15,70 @@ export interface PresetBuilding {
 }
 
 export const PRESET_BUILDINGS: PresetBuilding[] = [
+  {
+    id: 'glass_garden_conservatory',
+    name: 'Glass Garden Conservatory',
+    category: 'Botanical & Glass',
+    style: 'Art Nouveau Glasshouse & Conservatory',
+    description: 'Authentic 3-bay symmetrical facade with stepped quartz arches, central copper door, vaulted pink-tinted glass canopy, climbing facade vines, raised flower beds, and conifer trees.',
+    dimensions: { width: 21, height: 13, depth: 19 },
+    badgeColor: 'border-emerald-500/30 text-emerald-300',
+    sceneAnalysis: {
+      structureType: 'Glass Conservatory Pavilion',
+      style: 'Glass Garden',
+      archetype: 'conservatory_glass_garden',
+      estimatedDimensions: { width: 21, height: 13, depth: 19 },
+      cameraPerspective: 'ground_front',
+      confidence: {
+        overall: 0.96,
+        front: 0.98,
+        roof: 0.95,
+        sides: 0.92,
+        rear: 0.89,
+        materials: 0.97,
+      },
+      hasVegetation: true,
+      hasGardenBeds: true,
+      hasPathway: true,
+      hasArchedRibs: true,
+      hasGlassRoof: true,
+      paletteRecommendation: {
+        walls: 'smooth_quartz',
+        roof: 'pink_stained_glass',
+        trim: 'smooth_quartz',
+        windows: 'light_blue_stained_glass',
+        foundation: 'stone_bricks',
+        details: 'stone_brick_slab',
+        doors: 'copper_door',
+      },
+      floors: [
+        { level: 0, height: 5, wallMaterial: 'smooth_quartz', floorMaterial: 'smooth_stone' },
+      ],
+      roof: {
+        shape: 'mansard',
+        pitch: 1.15,
+        overhang: 0,
+        primaryMaterial: 'pink_stained_glass',
+        trimMaterial: 'smooth_quartz',
+      },
+      openings: [
+        { type: 'archway', wall: 'front', floorLevel: 0, xOffsetRatio: 0, widthRatio: 0.25, heightRatio: 0.7 },
+        { type: 'window', wall: 'front', floorLevel: 0, xOffsetRatio: -0.33, widthRatio: 0.25, heightRatio: 0.65 },
+        { type: 'window', wall: 'front', floorLevel: 0, xOffsetRatio: 0.33, widthRatio: 0.25, heightRatio: 0.65 },
+      ],
+      columns: [
+        { position: 'facade_spaced', material: 'smooth_quartz' },
+      ],
+      decorativeFeatures: [
+        'Stepped quartz arches',
+        'Vaulted glass canopy with continuing ribs',
+        'Central entrance copper door',
+        'Raised flower beds with peonies and lilacs',
+        'Left facade climbing leafy vines',
+        'Flanking conifer spruce trees',
+      ],
+    },
+  },
   {
     id: 'medieval_tavern',
     name: 'Medieval Watchtower & Tavern',
@@ -327,6 +393,17 @@ export function getPresetById(id: string): PresetBuilding | undefined {
 }
 
 export function generatePresetBuild(presetId: string, scale: number = 1.0, version: '1.20' | '1.21' = '1.21'): MinecraftBuild {
+  if (presetId === 'glass_garden_conservatory') {
+    const referenceBuilding = analyzeReferenceArchitecture({ name: 'Glass Garden Conservatory' }, [], {
+      buildScale: 'medium',
+      referenceMode: 'architecture_environment',
+      accuracy: 'high_detail',
+      inference: 'conservative',
+      minecraftVersion: version,
+    });
+    return buildMinecraftFromProxy(referenceBuilding, version, scale, true, true);
+  }
+
   const preset = getPresetById(presetId) || PRESET_BUILDINGS[0];
   return voxelizeSceneAnalysis(preset.sceneAnalysis, preset.name, scale, version);
 }

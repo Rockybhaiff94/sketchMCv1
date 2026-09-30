@@ -263,6 +263,10 @@ export function getBlockGeometry(
     case 'trapdoor':
       geo = createTrapdoorGeometry(openKey === 'true', halfKey);
       break;
+    case 'plant':
+    case 'torch':
+      geo = createCrossQuadGeometry();
+      break;
     default:
       geo = createCubeGeometry();
       break;

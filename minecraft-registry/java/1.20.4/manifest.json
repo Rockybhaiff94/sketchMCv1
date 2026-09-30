@@ -1,0 +1,20 @@
+{
+  "minecraftVersion": "1.20.4",
+  "edition": "java",
+  "source": {
+    "adapter": "unified-source",
+    "repository": "minecraft-assets + minecraft-data",
+    "revision": "1.20.4"
+  },
+  "schemaVersion": "1.0.0",
+  "status": "READY",
+  "checksum": "abd5a2663bceafa455ba2aa761b19f73f2c8e30bc240d3a7e0fc6659dc318628",
+  "importedAt": "2026-09-30T00:09:40.072Z",
+  "validatedAt": "2026-09-30T00:09:40.073Z",
+  "blockCount": 95,
+  "stateCount": 380,
+  "modelCount": 95,
+  "textureCount": 95,
+  "geometryCount": 95,
+  "importerVersion": "1.0.0"
+}

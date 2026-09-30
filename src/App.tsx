@@ -19,8 +19,24 @@ import {
   Box,
   Grid,
   FileCode2,
+  Building2,
+  Bot,
+  Database,
 } from 'lucide-react';
-import { MinecraftBuild, BlockPlacement } from './types/minecraft.ts';
+import {
+  MinecraftBuild,
+  BlockPlacement,
+  ReferenceImageItem,
+  ReconstructionSettings,
+  ReferenceBuilding,
+  IterationStepReport,
+  AgentReport,
+  CandidateSolution,
+  Neutral3DModel,
+  DepthModel,
+  Observation,
+  ReconstructionProject,
+} from './types/minecraft.ts';
 import { PRESET_BUILDINGS, generatePresetBuild } from './lib/presets.ts';
 import { ThreeViewport, ToolMode, ShadingMode } from './components/viewport/ThreeViewport.tsx';
 import { Toolbar } from './components/editor/Toolbar.tsx';
@@ -33,6 +49,13 @@ import { AIAssistantPanel } from './components/editor/AIAssistantPanel.tsx';
 import { ConfidenceHUD } from './components/editor/ConfidenceHUD.tsx';
 import { Schematic2DModal } from './components/editor/Schematic2DModal.tsx';
 import { ImageUploadModal } from './components/upload/ImageUploadModal.tsx';
+import { ReconstructionAnalysisPanel } from './components/editor/ReconstructionAnalysisPanel.tsx';
+import { AICouncilPanel } from './components/editor/AICouncilPanel.tsx';
+import { VisualDebugModal } from './components/editor/VisualDebugModal.tsx';
+import { MinecraftVersionModal } from './components/editor/MinecraftVersionModal.tsx';
+import { buildNeutral3DModel } from './lib/geometry/neutralModelBuilder.ts';
+import { CandidateSolver } from './lib/reconstruction/candidateSolver.ts';
+import { ConstructionPatternDatabase } from './lib/schematics/patternDatabase.ts';
 
 type AppTab = 'workbench' | 'gallery';
 type RightPanelTab = 'palette' | 'inspector';
@@ -46,12 +69,21 @@ export default function App() {
 
   // Core Build State (Initialized with Glass Garden Conservatory as premier reference)
   const [currentBuild, setCurrentBuild] = useState<MinecraftBuild>(() =>
-    generatePresetBuild('medieval_tavern', 1.0, '1.21')
+    generatePresetBuild('glass_garden_conservatory', 1.0, '1.21')
   );
+
+  // Multi-Agent Council & Neutral 3D Model State
+  const [isAICouncilOpen, setIsAICouncilOpen] = useState(false);
+  const [isVisualDebugOpen, setIsVisualDebugOpen] = useState(false);
+  const [councilReports, setCouncilReports] = useState<AgentReport[]>([]);
+  const [candidateSolutions, setCandidateSolutions] = useState<CandidateSolution[]>([]);
+  const [neutralModel, setNeutralModel] = useState<Neutral3DModel | undefined>();
+  const [depthModel, setDepthModel] = useState<DepthModel | undefined>();
+  const [currentProject, setCurrentProject] = useState<ReconstructionProject | undefined>();
 
   // History State for Undo/Redo
   const [history, setHistory] = useState<MinecraftBuild[]>([
-    generatePresetBuild('medieval_tavern', 1.0, '1.21'),
+    generatePresetBuild('glass_garden_conservatory', 1.0, '1.21'),
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
@@ -71,6 +103,8 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSchematic2DOpen, setIsSchematic2DOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
 
   // Upload & Reconstruction Pipeline Job State
   const [isProcessing, setIsProcessing] = useState(false);
@@ -140,6 +174,167 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleUndo, handleRedo]);
+
+  // Initialize Neutral 3D Model, Candidates, and Multi-Agent Council for initial reference
+  useEffect(() => {
+    if (currentBuild.metadata.referenceBuilding) {
+      const { neutralModel: nm, depthModel: dm } = buildNeutral3DModel(
+        currentBuild.metadata.referenceBuilding,
+        1.0
+      );
+      setNeutralModel(nm);
+      setDepthModel(dm);
+
+      const db = ConstructionPatternDatabase.getInstance();
+      const patterns = db.searchPatterns({ category: 'all' });
+      const obs = nm.components.map((c) => ({
+        regionId: c.id,
+        semanticType: c.type,
+        estimatedDepth: c.bounds.min.z,
+        thickness: c.thickness,
+        material: c.materialRegionId,
+        color: '#343438',
+        textureType: 'brick',
+        transparency: 0,
+        geometry: c.type,
+        observedOrInferred: 'observed' as const,
+        confidence: 0.95,
+      }));
+
+      const cands = CandidateSolver.generateAndSolveCandidates({
+        observations: obs,
+        hypotheses: [],
+        schematicPatterns: patterns,
+        targetVersion: selectedVersion,
+      });
+      setCandidateSolutions(cands);
+
+      setCouncilReports([
+        {
+          agent: 'hermes',
+          agentName: 'Hermes Lead Coordinator',
+          role: 'Lead AI Systems Architect & Co-Worker',
+          taskId: 'task_init',
+          analysisType: 'orchestrate',
+          status: 'complete',
+          observations: obs,
+          hypotheses: [
+            {
+              id: 'hypo_h_init',
+              description: 'Classical framed conservatory with 3 facade bays, rose stained vault canopy, and fluted piers.',
+              candidateBlockIds: ['minecraft:deepslate_tiles', 'minecraft:pink_stained_glass'],
+              probability: 0.98,
+              rationale: 'Council consensus reached.',
+            },
+          ],
+          candidateSolutions: cands,
+          confidence: 0.96,
+          uncertainties: [],
+          evidence: [],
+          recommendedNextAction: 'Ready for block editing or multi-agent calibration.',
+        },
+        {
+          agent: 'gpt',
+          agentName: 'GPT Architecture Specialist',
+          role: 'Architecture & Spatial Reasoning',
+          taskId: 'task_init_gpt',
+          analysisType: 'architectural_reasoning',
+          status: 'complete',
+          observations: obs,
+          hypotheses: [
+            {
+              id: 'hypo_gpt_init',
+              description: 'Tripartite modular symmetry verified. Pilasters project 0.5m forward from glazing.',
+              candidateBlockIds: ['minecraft:deepslate_tiles'],
+              probability: 0.95,
+              rationale: 'Bilateral rhythm verified.',
+            },
+          ],
+          candidateSolutions: cands,
+          confidence: 0.95,
+          uncertainties: [],
+          evidence: [],
+        },
+        {
+          agent: 'gemini',
+          agentName: 'Gemini Vision Specialist',
+          role: 'Vision, Depth & Occlusion',
+          taskId: 'task_init_gemini',
+          analysisType: 'vision_depth',
+          status: 'complete',
+          observations: obs,
+          hypotheses: [
+            {
+              id: 'hypo_gem_init',
+              description: '4 depth planes detected: foreground foliage, facade piers, inset glazing, and canopy vault.',
+              candidateBlockIds: ['minecraft:pink_stained_glass', 'minecraft:light_blue_stained_glass_pane'],
+              probability: 0.94,
+              rationale: 'Depth gradient confirmed.',
+            },
+          ],
+          candidateSolutions: [],
+          confidence: 0.94,
+          uncertainties: [],
+          evidence: [],
+        },
+        {
+          agent: 'grok',
+          agentName: 'Grok Adversarial Critic',
+          role: 'Independent Adversarial Critic',
+          taskId: 'task_init_grok',
+          analysisType: 'adversarial_critique',
+          status: 'complete',
+          observations: obs,
+          hypotheses: [
+            {
+              id: 'hypo_grok_init',
+              description: 'Deepslate tiles provide superior mortar line frequency over standard deepslate bricks.',
+              candidateBlockIds: ['minecraft:deepslate_tiles', 'minecraft:polished_blackstone_bricks'],
+              probability: 0.92,
+              rationale: 'Challenged basic brick assumption.',
+            },
+          ],
+          candidateSolutions: [],
+          confidence: 0.92,
+          uncertainties: [],
+          evidence: [],
+        },
+      ]);
+    }
+  }, []);
+
+  const handleRunCouncilOrchestration = async () => {
+    setIsProcessing(true);
+    setProcessingStep('Hermes orchestrating specialists (Gemini, GPT, Grok)...');
+    setProcessingProgress(40);
+    try {
+      const response = await fetch('/api/ai/orchestrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          images: [],
+          scale: 1.0,
+          version: selectedVersion,
+          customPrompt: 'Calibrate facade and verify depth layers',
+        }),
+      });
+      const data = await response.json();
+      if (data.success && data.project) {
+        setCurrentProject(data.project);
+        if (data.councilReports) setCouncilReports(data.councilReports);
+        if (data.project.candidateSolutions) setCandidateSolutions(data.project.candidateSolutions);
+        if (data.project.neutralModel) setNeutralModel(data.project.neutralModel);
+        if (data.project.depthModel) setDepthModel(data.project.depthModel);
+        if (data.project.currentBuild) {
+          pushHistory(data.project.currentBuild);
+        }
+      }
+    } catch (err: any) {
+      console.warn('Orchestration error:', err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   // Handle Block Selection - Automatically switches right panel tab to inspector
   const handleSelectBlock = (block: BlockPlacement | null) => {
@@ -215,42 +410,40 @@ export default function App() {
 
   // Start Multi-Stage AI Reconstruction Job
   const handleStartReconstruction = async (data: {
-    imageFile?: File;
-    imageDataUrl?: string;
+    images: ReferenceImageItem[];
     presetId?: string;
-    scale: number;
-    minecraftVersion: '1.20' | '1.21';
+    settings: ReconstructionSettings;
   }) => {
     setIsProcessing(true);
     setProcessingProgress(15);
-    setProcessingStep('Analyzing silhouette, materials & perspective with Gemini 3.8 Flash...');
+    setProcessingStep('Analyzing silhouette, facade bays, and stepped arches...');
 
     try {
       setTimeout(() => {
         setProcessingProgress(45);
-        setProcessingStep('Segmenting architectural framing, arches, and glass facades...');
-      }, 600);
+        setProcessingStep('Solving 3D architectural proxy and proportion alignment...');
+      }, 500);
 
       setTimeout(() => {
-        setProcessingProgress(70);
-        setProcessingStep('Solving discrete Minecraft voxel grid & blockstate orientations...');
-      }, 1400);
+        setProcessingProgress(75);
+        setProcessingStep('Executing 6-step iterative render-vs-reference calibration...');
+      }, 1200);
 
       const response = await fetch('/api/reconstruct', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          imageBase64: data.imageDataUrl,
-          mimeType: data.imageFile?.type || 'image/jpeg',
+          images: data.images,
           presetId: data.presetId,
-          scale: data.scale,
-          version: data.minecraftVersion,
+          settings: data.settings,
+          scale: data.settings?.customScaleMultiplier || 1.0,
+          version: data.settings?.minecraftVersion || selectedVersion,
         }),
       });
 
       const resData = await response.json();
       if (!response.ok || !resData.success) {
-        throw new Error(resData.error || 'Failed reconstruction');
+        throw new Error(resData.error || resData.details || 'Failed reconstruction');
       }
 
       setProcessingProgress(100);
@@ -264,7 +457,19 @@ export default function App() {
         setHistory([newBuild]);
         setHistoryIndex(0);
         setCurrentLayerSlice(Math.max(1, newBuild.dimensions.height));
+        setSelectedVersion(newBuild.version);
         setActiveTab('workbench');
+
+        // Store Multi-Agent Council & Neutral 3D Model outputs
+        if (resData.councilReports) setCouncilReports(resData.councilReports);
+        if (resData.candidateSolutions) setCandidateSolutions(resData.candidateSolutions);
+        if (resData.neutralModel) setNeutralModel(resData.neutralModel);
+        if (resData.depthModel) setDepthModel(resData.depthModel);
+        if (resData.project) setCurrentProject(resData.project);
+
+        if (newBuild.metadata.referenceBuilding) {
+          setIsAnalysisPanelOpen(true);
+        }
       }, 400);
     } catch (err: any) {
       console.error(err);
@@ -353,6 +558,50 @@ export default function App() {
           >
             <Sparkles className="w-3.5 h-3.5 text-purple-400" />
             <span className="hidden md:inline">AI Edit</span>
+          </button>
+
+          <button
+            onClick={() => setIsAnalysisPanelOpen(!isAnalysisPanelOpen)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+              isAnalysisPanelOpen
+                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                : 'text-emerald-400 hover:text-emerald-300 bg-slate-950/60 border-slate-800'
+            }`}
+            title="View Reference Architectural Decomposition & Convergence Trace"
+          >
+            <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden md:inline">Analysis</span>
+          </button>
+
+          <button
+            onClick={() => setIsAICouncilOpen(!isAICouncilOpen)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+              isAICouncilOpen
+                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
+                : 'text-emerald-400 hover:text-emerald-300 bg-slate-950/60 border-slate-800'
+            }`}
+            title="Open Hermes Multi-Agent Council (Hermes, GPT, Gemini, Grok)"
+          >
+            <Bot className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden md:inline">AI Council</span>
+          </button>
+
+          <button
+            onClick={() => setIsVisualDebugOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
+            title="Open Visual Debug & Neutral 3D Model Inspector"
+          >
+            <Box className="w-3.5 h-3.5 text-sky-400" />
+            <span className="hidden md:inline">Visual Debug</span>
+          </button>
+
+          <button
+            onClick={() => setIsVersionModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
+            title="Minecraft Version Registry & Immutability Manager"
+          >
+            <Database className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden md:inline font-mono">v{currentBuild.metadata.minecraftVersion || '1.21.1'}</span>
           </button>
 
           <button
@@ -473,6 +722,31 @@ export default function App() {
                 />
               </div>
             )}
+
+            {/* Reconstruction Architectural Analysis Panel (when opened) */}
+            {isAnalysisPanelOpen && currentBuild.metadata.referenceBuilding && (
+              <div className="absolute top-3 left-3 z-20 w-84 h-[calc(100%-1.5rem)] shadow-2xl">
+                <ReconstructionAnalysisPanel
+                  referenceBuilding={currentBuild.metadata.referenceBuilding}
+                  iterationHistory={currentBuild.metadata.iterationHistory}
+                  isOpen={isAnalysisPanelOpen}
+                  onClose={() => setIsAnalysisPanelOpen(false)}
+                />
+              </div>
+            )}
+
+            {/* AI Council Workspace Drawer (when opened) */}
+            {isAICouncilOpen && (
+              <div className="absolute top-3 right-3 z-30 w-96 h-[calc(100%-1.5rem)] shadow-2xl rounded-lg overflow-hidden border border-slate-700/80">
+                <AICouncilPanel
+                  councilReports={councilReports}
+                  candidateSolutions={candidateSolutions}
+                  project={currentProject}
+                  onRunCouncil={handleRunCouncilOrchestration}
+                  isLoading={isProcessing}
+                />
+              </div>
+            )}
           </div>
 
           {/* DOCKED BOTTOM BAR: Slicer, Layer Controls & Live Status */}
@@ -568,6 +842,7 @@ export default function App() {
             <ConfidenceHUD
               confidence={currentBuild.metadata.confidence}
               onReconstructRegion={(r) => handleApplyPromptEdit(`Re-optimize ${r} architecture`)}
+              onOpenAnalysis={() => setIsAnalysisPanelOpen(true)}
             />
           </div>
         </div>
@@ -602,6 +877,24 @@ export default function App() {
         onClose={() => setIsSchematic2DOpen(false)}
         build={currentBuild}
         initialY={currentLayerSlice}
+      />
+
+      <VisualDebugModal
+        isOpen={isVisualDebugOpen}
+        onClose={() => setIsVisualDebugOpen(false)}
+        referenceImageUrl={currentBuild.metadata.sourceImage || '/glass_garden_test.jpg'}
+        referenceBuilding={currentBuild.metadata.referenceBuilding}
+        neutralModel={neutralModel}
+        depthModel={depthModel}
+        candidateSolutions={candidateSolutions}
+        observations={councilReports[0]?.observations || []}
+      />
+
+      <MinecraftVersionModal
+        isOpen={isVersionModalOpen}
+        onClose={() => setIsVersionModalOpen(false)}
+        currentBuild={currentBuild}
+        onBuildMigrated={(migrated) => pushHistory(migrated)}
       />
     </div>
   );

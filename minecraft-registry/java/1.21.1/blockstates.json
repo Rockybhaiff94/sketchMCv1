@@ -1,0 +1,1101 @@
+{
+  "minecraft:stone": {
+    "variants": {
+      "": {
+        "model": "block/stone"
+      }
+    }
+  },
+  "minecraft:smooth_stone": {
+    "variants": {
+      "": {
+        "model": "block/smooth_stone"
+      }
+    }
+  },
+  "minecraft:smooth_stone_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/smooth_stone_slab"
+      },
+      "type=top": {
+        "model": "block/smooth_stone_slab_top"
+      },
+      "type=double": {
+        "model": "block/smooth_stone_slab_double"
+      }
+    }
+  },
+  "minecraft:cobblestone": {
+    "variants": {
+      "": {
+        "model": "block/cobblestone"
+      }
+    }
+  },
+  "minecraft:cobblestone_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/cobblestone_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/cobblestone_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/cobblestone_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/cobblestone_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:cobblestone_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/cobblestone_slab"
+      },
+      "type=top": {
+        "model": "block/cobblestone_slab_top"
+      },
+      "type=double": {
+        "model": "block/cobblestone_slab_double"
+      }
+    }
+  },
+  "minecraft:cobblestone_wall": {
+    "multipart": [
+      {
+        "when": {
+          "up": "true"
+        },
+        "apply": {
+          "model": "block/cobblestone_wall_post"
+        }
+      },
+      {
+        "when": {
+          "north": "low"
+        },
+        "apply": {
+          "model": "block/cobblestone_wall_side",
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "east": "low"
+        },
+        "apply": {
+          "model": "block/cobblestone_wall_side",
+          "y": 90,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "south": "low"
+        },
+        "apply": {
+          "model": "block/cobblestone_wall_side",
+          "y": 180,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "west": "low"
+        },
+        "apply": {
+          "model": "block/cobblestone_wall_side",
+          "y": 270,
+          "uvlock": true
+        }
+      }
+    ]
+  },
+  "minecraft:stone_bricks": {
+    "variants": {
+      "": {
+        "model": "block/stone_bricks"
+      }
+    }
+  },
+  "minecraft:stone_brick_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/stone_brick_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/stone_brick_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/stone_brick_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/stone_brick_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:stone_brick_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/stone_brick_slab"
+      },
+      "type=top": {
+        "model": "block/stone_brick_slab_top"
+      },
+      "type=double": {
+        "model": "block/stone_brick_slab_double"
+      }
+    }
+  },
+  "minecraft:stone_brick_wall": {
+    "multipart": [
+      {
+        "when": {
+          "up": "true"
+        },
+        "apply": {
+          "model": "block/stone_brick_wall_post"
+        }
+      },
+      {
+        "when": {
+          "north": "low"
+        },
+        "apply": {
+          "model": "block/stone_brick_wall_side",
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "east": "low"
+        },
+        "apply": {
+          "model": "block/stone_brick_wall_side",
+          "y": 90,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "south": "low"
+        },
+        "apply": {
+          "model": "block/stone_brick_wall_side",
+          "y": 180,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "west": "low"
+        },
+        "apply": {
+          "model": "block/stone_brick_wall_side",
+          "y": 270,
+          "uvlock": true
+        }
+      }
+    ]
+  },
+  "minecraft:mossy_stone_bricks": {
+    "variants": {
+      "": {
+        "model": "block/mossy_stone_bricks"
+      }
+    }
+  },
+  "minecraft:chiseled_stone_bricks": {
+    "variants": {
+      "": {
+        "model": "block/chiseled_stone_bricks"
+      }
+    }
+  },
+  "minecraft:deepslate": {
+    "variants": {
+      "": {
+        "model": "block/deepslate"
+      }
+    }
+  },
+  "minecraft:cobbled_deepslate": {
+    "variants": {
+      "": {
+        "model": "block/cobbled_deepslate"
+      }
+    }
+  },
+  "minecraft:polished_deepslate": {
+    "variants": {
+      "": {
+        "model": "block/polished_deepslate"
+      }
+    }
+  },
+  "minecraft:deepslate_tiles": {
+    "variants": {
+      "": {
+        "model": "block/deepslate_tiles"
+      }
+    }
+  },
+  "minecraft:deepslate_tile_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/deepslate_tile_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/deepslate_tile_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/deepslate_tile_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/deepslate_tile_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:deepslate_tile_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/deepslate_tile_slab"
+      },
+      "type=top": {
+        "model": "block/deepslate_tile_slab_top"
+      },
+      "type=double": {
+        "model": "block/deepslate_tile_slab_double"
+      }
+    }
+  },
+  "minecraft:deepslate_bricks": {
+    "variants": {
+      "": {
+        "model": "block/deepslate_bricks"
+      }
+    }
+  },
+  "minecraft:deepslate_brick_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/deepslate_brick_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/deepslate_brick_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/deepslate_brick_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/deepslate_brick_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:deepslate_brick_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/deepslate_brick_slab"
+      },
+      "type=top": {
+        "model": "block/deepslate_brick_slab_top"
+      },
+      "type=double": {
+        "model": "block/deepslate_brick_slab_double"
+      }
+    }
+  },
+  "minecraft:deepslate_tile_wall": {
+    "multipart": [
+      {
+        "when": {
+          "up": "true"
+        },
+        "apply": {
+          "model": "block/deepslate_tile_wall_post"
+        }
+      },
+      {
+        "when": {
+          "north": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_tile_wall_side",
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "east": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_tile_wall_side",
+          "y": 90,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "south": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_tile_wall_side",
+          "y": 180,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "west": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_tile_wall_side",
+          "y": 270,
+          "uvlock": true
+        }
+      }
+    ]
+  },
+  "minecraft:deepslate_brick_wall": {
+    "multipart": [
+      {
+        "when": {
+          "up": "true"
+        },
+        "apply": {
+          "model": "block/deepslate_brick_wall_post"
+        }
+      },
+      {
+        "when": {
+          "north": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_brick_wall_side",
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "east": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_brick_wall_side",
+          "y": 90,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "south": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_brick_wall_side",
+          "y": 180,
+          "uvlock": true
+        }
+      },
+      {
+        "when": {
+          "west": "low"
+        },
+        "apply": {
+          "model": "block/deepslate_brick_wall_side",
+          "y": 270,
+          "uvlock": true
+        }
+      }
+    ]
+  },
+  "minecraft:quartz_block": {
+    "variants": {
+      "": {
+        "model": "block/quartz_block"
+      }
+    }
+  },
+  "minecraft:smooth_quartz": {
+    "variants": {
+      "": {
+        "model": "block/smooth_quartz"
+      }
+    }
+  },
+  "minecraft:smooth_quartz_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/smooth_quartz_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/smooth_quartz_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/smooth_quartz_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/smooth_quartz_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:smooth_quartz_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/smooth_quartz_slab"
+      },
+      "type=top": {
+        "model": "block/smooth_quartz_slab_top"
+      },
+      "type=double": {
+        "model": "block/smooth_quartz_slab_double"
+      }
+    }
+  },
+  "minecraft:quartz_pillar": {
+    "variants": {
+      "": {
+        "model": "block/quartz_pillar"
+      }
+    }
+  },
+  "minecraft:sandstone": {
+    "variants": {
+      "": {
+        "model": "block/sandstone"
+      }
+    }
+  },
+  "minecraft:smooth_sandstone": {
+    "variants": {
+      "": {
+        "model": "block/smooth_sandstone"
+      }
+    }
+  },
+  "minecraft:sandstone_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/sandstone_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/sandstone_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/sandstone_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/sandstone_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:sandstone_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/sandstone_slab"
+      },
+      "type=top": {
+        "model": "block/sandstone_slab_top"
+      },
+      "type=double": {
+        "model": "block/sandstone_slab_double"
+      }
+    }
+  },
+  "minecraft:bricks": {
+    "variants": {
+      "": {
+        "model": "block/bricks"
+      }
+    }
+  },
+  "minecraft:brick_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/brick_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/brick_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/brick_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/brick_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:tuff": {
+    "variants": {
+      "": {
+        "model": "block/tuff"
+      }
+    }
+  },
+  "minecraft:tuff_bricks": {
+    "variants": {
+      "": {
+        "model": "block/tuff_bricks"
+      }
+    }
+  },
+  "minecraft:tuff_brick_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/tuff_brick_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/tuff_brick_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/tuff_brick_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/tuff_brick_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:cut_copper": {
+    "variants": {
+      "": {
+        "model": "block/cut_copper"
+      }
+    }
+  },
+  "minecraft:copper_grate": {
+    "variants": {
+      "": {
+        "model": "block/copper_grate"
+      }
+    }
+  },
+  "minecraft:copper_door": {
+    "variants": {
+      "": {
+        "model": "block/copper_door"
+      }
+    }
+  },
+  "minecraft:oxidized_copper_door": {
+    "variants": {
+      "": {
+        "model": "block/oxidized_copper_door"
+      }
+    }
+  },
+  "minecraft:oak_planks": {
+    "variants": {
+      "": {
+        "model": "block/oak_planks"
+      }
+    }
+  },
+  "minecraft:oak_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/oak_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/oak_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/oak_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/oak_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:oak_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/oak_slab"
+      },
+      "type=top": {
+        "model": "block/oak_slab_top"
+      },
+      "type=double": {
+        "model": "block/oak_slab_double"
+      }
+    }
+  },
+  "minecraft:oak_log": {
+    "variants": {
+      "": {
+        "model": "block/oak_log"
+      }
+    }
+  },
+  "minecraft:oak_fence": {
+    "variants": {
+      "": {
+        "model": "block/oak_fence"
+      }
+    }
+  },
+  "minecraft:oak_door": {
+    "variants": {
+      "": {
+        "model": "block/oak_door"
+      }
+    }
+  },
+  "minecraft:oak_trapdoor": {
+    "variants": {
+      "": {
+        "model": "block/oak_trapdoor"
+      }
+    }
+  },
+  "minecraft:spruce_planks": {
+    "variants": {
+      "": {
+        "model": "block/spruce_planks"
+      }
+    }
+  },
+  "minecraft:spruce_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/spruce_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/spruce_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/spruce_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/spruce_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:spruce_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/spruce_slab"
+      },
+      "type=top": {
+        "model": "block/spruce_slab_top"
+      },
+      "type=double": {
+        "model": "block/spruce_slab_double"
+      }
+    }
+  },
+  "minecraft:spruce_log": {
+    "variants": {
+      "": {
+        "model": "block/spruce_log"
+      }
+    }
+  },
+  "minecraft:spruce_fence": {
+    "variants": {
+      "": {
+        "model": "block/spruce_fence"
+      }
+    }
+  },
+  "minecraft:dark_oak_planks": {
+    "variants": {
+      "": {
+        "model": "block/dark_oak_planks"
+      }
+    }
+  },
+  "minecraft:dark_oak_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/dark_oak_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/dark_oak_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/dark_oak_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/dark_oak_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:dark_oak_slab": {
+    "variants": {
+      "type=bottom": {
+        "model": "block/dark_oak_slab"
+      },
+      "type=top": {
+        "model": "block/dark_oak_slab_top"
+      },
+      "type=double": {
+        "model": "block/dark_oak_slab_double"
+      }
+    }
+  },
+  "minecraft:dark_oak_log": {
+    "variants": {
+      "": {
+        "model": "block/dark_oak_log"
+      }
+    }
+  },
+  "minecraft:cherry_planks": {
+    "variants": {
+      "": {
+        "model": "block/cherry_planks"
+      }
+    }
+  },
+  "minecraft:cherry_stairs": {
+    "variants": {
+      "facing=north,half=bottom,shape=straight": {
+        "model": "block/cherry_stairs",
+        "y": 0
+      },
+      "facing=south,half=bottom,shape=straight": {
+        "model": "block/cherry_stairs",
+        "y": 180
+      },
+      "facing=west,half=bottom,shape=straight": {
+        "model": "block/cherry_stairs",
+        "y": 270
+      },
+      "facing=east,half=bottom,shape=straight": {
+        "model": "block/cherry_stairs",
+        "y": 90
+      }
+    }
+  },
+  "minecraft:glass": {
+    "variants": {
+      "": {
+        "model": "block/glass"
+      }
+    }
+  },
+  "minecraft:glass_pane": {
+    "variants": {
+      "": {
+        "model": "block/glass_pane"
+      }
+    }
+  },
+  "minecraft:white_stained_glass": {
+    "variants": {
+      "": {
+        "model": "block/white_stained_glass"
+      }
+    }
+  },
+  "minecraft:white_stained_glass_pane": {
+    "variants": {
+      "": {
+        "model": "block/white_stained_glass_pane"
+      }
+    }
+  },
+  "minecraft:pink_stained_glass": {
+    "variants": {
+      "": {
+        "model": "block/pink_stained_glass"
+      }
+    }
+  },
+  "minecraft:pink_stained_glass_pane": {
+    "variants": {
+      "": {
+        "model": "block/pink_stained_glass_pane"
+      }
+    }
+  },
+  "minecraft:light_blue_stained_glass": {
+    "variants": {
+      "": {
+        "model": "block/light_blue_stained_glass"
+      }
+    }
+  },
+  "minecraft:light_blue_stained_glass_pane": {
+    "variants": {
+      "": {
+        "model": "block/light_blue_stained_glass_pane"
+      }
+    }
+  },
+  "minecraft:tinted_glass": {
+    "variants": {
+      "": {
+        "model": "block/tinted_glass"
+      }
+    }
+  },
+  "minecraft:white_concrete": {
+    "variants": {
+      "": {
+        "model": "block/white_concrete"
+      }
+    }
+  },
+  "minecraft:light_gray_concrete": {
+    "variants": {
+      "": {
+        "model": "block/light_gray_concrete"
+      }
+    }
+  },
+  "minecraft:gray_concrete": {
+    "variants": {
+      "": {
+        "model": "block/gray_concrete"
+      }
+    }
+  },
+  "minecraft:black_concrete": {
+    "variants": {
+      "": {
+        "model": "block/black_concrete"
+      }
+    }
+  },
+  "minecraft:cyan_concrete": {
+    "variants": {
+      "": {
+        "model": "block/cyan_concrete"
+      }
+    }
+  },
+  "minecraft:light_blue_concrete": {
+    "variants": {
+      "": {
+        "model": "block/light_blue_concrete"
+      }
+    }
+  },
+  "minecraft:grass_block": {
+    "variants": {
+      "": {
+        "model": "block/grass_block"
+      }
+    }
+  },
+  "minecraft:dirt": {
+    "variants": {
+      "": {
+        "model": "block/dirt"
+      }
+    }
+  },
+  "minecraft:moss_block": {
+    "variants": {
+      "": {
+        "model": "block/moss_block"
+      }
+    }
+  },
+  "minecraft:oak_leaves": {
+    "variants": {
+      "": {
+        "model": "block/oak_leaves"
+      }
+    }
+  },
+  "minecraft:vine": {
+    "variants": {
+      "": {
+        "model": "block/vine"
+      }
+    }
+  },
+  "minecraft:cherry_leaves": {
+    "variants": {
+      "": {
+        "model": "block/cherry_leaves"
+      }
+    }
+  },
+  "minecraft:flowering_azalea_leaves": {
+    "variants": {
+      "": {
+        "model": "block/flowering_azalea_leaves"
+      }
+    }
+  },
+  "minecraft:spruce_leaves": {
+    "variants": {
+      "": {
+        "model": "block/spruce_leaves"
+      }
+    }
+  },
+  "minecraft:birch_leaves": {
+    "variants": {
+      "": {
+        "model": "block/birch_leaves"
+      }
+    }
+  },
+  "minecraft:dark_oak_leaves": {
+    "variants": {
+      "": {
+        "model": "block/dark_oak_leaves"
+      }
+    }
+  },
+  "minecraft:short_grass": {
+    "variants": {
+      "": {
+        "model": "block/short_grass"
+      }
+    }
+  },
+  "minecraft:poppy": {
+    "variants": {
+      "": {
+        "model": "block/poppy"
+      }
+    }
+  },
+  "minecraft:dandelion": {
+    "variants": {
+      "": {
+        "model": "block/dandelion"
+      }
+    }
+  },
+  "minecraft:blue_orchid": {
+    "variants": {
+      "": {
+        "model": "block/blue_orchid"
+      }
+    }
+  },
+  "minecraft:peony": {
+    "variants": {
+      "": {
+        "model": "block/peony"
+      }
+    }
+  },
+  "minecraft:lilac": {
+    "variants": {
+      "": {
+        "model": "block/lilac"
+      }
+    }
+  },
+  "minecraft:pink_tulip": {
+    "variants": {
+      "": {
+        "model": "block/pink_tulip"
+      }
+    }
+  },
+  "minecraft:allium": {
+    "variants": {
+      "": {
+        "model": "block/allium"
+      }
+    }
+  },
+  "minecraft:lantern": {
+    "variants": {
+      "": {
+        "model": "block/lantern"
+      }
+    }
+  },
+  "minecraft:sea_lantern": {
+    "variants": {
+      "": {
+        "model": "block/sea_lantern"
+      }
+    }
+  },
+  "minecraft:glowstone": {
+    "variants": {
+      "": {
+        "model": "block/glowstone"
+      }
+    }
+  },
+  "minecraft:chain": {
+    "variants": {
+      "": {
+        "model": "block/chain"
+      }
+    }
+  },
+  "minecraft:iron_bars": {
+    "variants": {
+      "": {
+        "model": "block/iron_bars"
+      }
+    }
+  },
+  "minecraft:chest": {
+    "variants": {
+      "": {
+        "model": "block/chest"
+      }
+    }
+  },
+  "minecraft:crafting_table": {
+    "variants": {
+      "": {
+        "model": "block/crafting_table"
+      }
+    }
+  },
+  "minecraft:bookshelf": {
+    "variants": {
+      "": {
+        "model": "block/bookshelf"
+      }
+    }
+  }
+}

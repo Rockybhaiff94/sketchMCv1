@@ -1,0 +1,640 @@
+{
+  "block/stone": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/stone"
+    }
+  },
+  "block/smooth_stone": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/smooth_stone"
+    }
+  },
+  "block/smooth_stone_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/smooth_stone_slab",
+      "top": "block/smooth_stone_slab",
+      "side": "block/smooth_stone_slab"
+    }
+  },
+  "block/cobblestone": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/cobblestone"
+    }
+  },
+  "block/cobblestone_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/cobblestone_stairs",
+      "top": "block/cobblestone_stairs",
+      "side": "block/cobblestone_stairs"
+    }
+  },
+  "block/cobblestone_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/cobblestone_slab",
+      "top": "block/cobblestone_slab",
+      "side": "block/cobblestone_slab"
+    }
+  },
+  "block/cobblestone_wall_post": {
+    "parent": "block/template_wall_post"
+  },
+  "block/stone_bricks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/stone_bricks"
+    }
+  },
+  "block/stone_brick_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/stone_brick_stairs",
+      "top": "block/stone_brick_stairs",
+      "side": "block/stone_brick_stairs"
+    }
+  },
+  "block/stone_brick_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/stone_brick_slab",
+      "top": "block/stone_brick_slab",
+      "side": "block/stone_brick_slab"
+    }
+  },
+  "block/stone_brick_wall_post": {
+    "parent": "block/template_wall_post"
+  },
+  "block/mossy_stone_bricks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/mossy_stone_bricks"
+    }
+  },
+  "block/chiseled_stone_bricks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/chiseled_stone_bricks"
+    }
+  },
+  "block/deepslate": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/deepslate"
+    }
+  },
+  "block/cobbled_deepslate": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/cobbled_deepslate"
+    }
+  },
+  "block/polished_deepslate": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/polished_deepslate"
+    }
+  },
+  "block/deepslate_tiles": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/deepslate_tiles"
+    }
+  },
+  "block/deepslate_tile_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/deepslate_tile_stairs",
+      "top": "block/deepslate_tile_stairs",
+      "side": "block/deepslate_tile_stairs"
+    }
+  },
+  "block/deepslate_tile_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/deepslate_tile_slab",
+      "top": "block/deepslate_tile_slab",
+      "side": "block/deepslate_tile_slab"
+    }
+  },
+  "block/deepslate_bricks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/deepslate_bricks"
+    }
+  },
+  "block/deepslate_brick_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/deepslate_brick_stairs",
+      "top": "block/deepslate_brick_stairs",
+      "side": "block/deepslate_brick_stairs"
+    }
+  },
+  "block/deepslate_brick_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/deepslate_brick_slab",
+      "top": "block/deepslate_brick_slab",
+      "side": "block/deepslate_brick_slab"
+    }
+  },
+  "block/deepslate_tile_wall_post": {
+    "parent": "block/template_wall_post"
+  },
+  "block/deepslate_brick_wall_post": {
+    "parent": "block/template_wall_post"
+  },
+  "block/quartz_block": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/quartz_block"
+    }
+  },
+  "block/smooth_quartz": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/smooth_quartz"
+    }
+  },
+  "block/smooth_quartz_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/smooth_quartz_stairs",
+      "top": "block/smooth_quartz_stairs",
+      "side": "block/smooth_quartz_stairs"
+    }
+  },
+  "block/smooth_quartz_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/smooth_quartz_slab",
+      "top": "block/smooth_quartz_slab",
+      "side": "block/smooth_quartz_slab"
+    }
+  },
+  "block/quartz_pillar": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/quartz_pillar"
+    }
+  },
+  "block/sandstone": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/sandstone"
+    }
+  },
+  "block/smooth_sandstone": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/smooth_sandstone"
+    }
+  },
+  "block/sandstone_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/sandstone_stairs",
+      "top": "block/sandstone_stairs",
+      "side": "block/sandstone_stairs"
+    }
+  },
+  "block/sandstone_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/sandstone_slab",
+      "top": "block/sandstone_slab",
+      "side": "block/sandstone_slab"
+    }
+  },
+  "block/bricks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/bricks"
+    }
+  },
+  "block/brick_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/brick_stairs",
+      "top": "block/brick_stairs",
+      "side": "block/brick_stairs"
+    }
+  },
+  "block/tuff": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/tuff"
+    }
+  },
+  "block/tuff_bricks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/tuff_bricks"
+    }
+  },
+  "block/tuff_brick_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/tuff_brick_stairs",
+      "top": "block/tuff_brick_stairs",
+      "side": "block/tuff_brick_stairs"
+    }
+  },
+  "block/cut_copper": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/cut_copper"
+    }
+  },
+  "block/copper_grate": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/copper_grate"
+    }
+  },
+  "block/copper_door": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/copper_door"
+    }
+  },
+  "block/oxidized_copper_door": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/oxidized_copper_door"
+    }
+  },
+  "block/oak_planks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/oak_planks"
+    }
+  },
+  "block/oak_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/oak_stairs",
+      "top": "block/oak_stairs",
+      "side": "block/oak_stairs"
+    }
+  },
+  "block/oak_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/oak_slab",
+      "top": "block/oak_slab",
+      "side": "block/oak_slab"
+    }
+  },
+  "block/oak_log": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/oak_log"
+    }
+  },
+  "block/oak_fence": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/oak_fence"
+    }
+  },
+  "block/oak_door": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/oak_door"
+    }
+  },
+  "block/oak_trapdoor": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/oak_trapdoor"
+    }
+  },
+  "block/spruce_planks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/spruce_planks"
+    }
+  },
+  "block/spruce_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/spruce_stairs",
+      "top": "block/spruce_stairs",
+      "side": "block/spruce_stairs"
+    }
+  },
+  "block/spruce_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/spruce_slab",
+      "top": "block/spruce_slab",
+      "side": "block/spruce_slab"
+    }
+  },
+  "block/spruce_log": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/spruce_log"
+    }
+  },
+  "block/spruce_fence": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/spruce_fence"
+    }
+  },
+  "block/dark_oak_planks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/dark_oak_planks"
+    }
+  },
+  "block/dark_oak_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/dark_oak_stairs",
+      "top": "block/dark_oak_stairs",
+      "side": "block/dark_oak_stairs"
+    }
+  },
+  "block/dark_oak_slab": {
+    "parent": "block/slab",
+    "textures": {
+      "bottom": "block/dark_oak_slab",
+      "top": "block/dark_oak_slab",
+      "side": "block/dark_oak_slab"
+    }
+  },
+  "block/dark_oak_log": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/dark_oak_log"
+    }
+  },
+  "block/cherry_planks": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/cherry_planks"
+    }
+  },
+  "block/cherry_stairs": {
+    "parent": "block/stairs",
+    "textures": {
+      "bottom": "block/cherry_stairs",
+      "top": "block/cherry_stairs",
+      "side": "block/cherry_stairs"
+    }
+  },
+  "block/glass": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/glass"
+    }
+  },
+  "block/glass_pane": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/glass_pane"
+    }
+  },
+  "block/white_stained_glass": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/white_stained_glass"
+    }
+  },
+  "block/white_stained_glass_pane": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/white_stained_glass_pane"
+    }
+  },
+  "block/pink_stained_glass": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/pink_stained_glass"
+    }
+  },
+  "block/pink_stained_glass_pane": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/pink_stained_glass_pane"
+    }
+  },
+  "block/light_blue_stained_glass": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/light_blue_stained_glass"
+    }
+  },
+  "block/light_blue_stained_glass_pane": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/light_blue_stained_glass_pane"
+    }
+  },
+  "block/tinted_glass": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/tinted_glass"
+    }
+  },
+  "block/white_concrete": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/white_concrete"
+    }
+  },
+  "block/light_gray_concrete": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/light_gray_concrete"
+    }
+  },
+  "block/gray_concrete": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/gray_concrete"
+    }
+  },
+  "block/black_concrete": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/black_concrete"
+    }
+  },
+  "block/cyan_concrete": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/cyan_concrete"
+    }
+  },
+  "block/light_blue_concrete": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/light_blue_concrete"
+    }
+  },
+  "block/grass_block": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/grass_block"
+    }
+  },
+  "block/dirt": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/dirt"
+    }
+  },
+  "block/moss_block": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/moss_block"
+    }
+  },
+  "block/oak_leaves": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/oak_leaves"
+    }
+  },
+  "block/vine": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/vine"
+    }
+  },
+  "block/cherry_leaves": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/cherry_leaves"
+    }
+  },
+  "block/flowering_azalea_leaves": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/flowering_azalea_leaves"
+    }
+  },
+  "block/spruce_leaves": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/spruce_leaves"
+    }
+  },
+  "block/birch_leaves": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/birch_leaves"
+    }
+  },
+  "block/dark_oak_leaves": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/dark_oak_leaves"
+    }
+  },
+  "block/short_grass": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/short_grass"
+    }
+  },
+  "block/poppy": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/poppy"
+    }
+  },
+  "block/dandelion": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/dandelion"
+    }
+  },
+  "block/blue_orchid": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/blue_orchid"
+    }
+  },
+  "block/peony": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/peony"
+    }
+  },
+  "block/lilac": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/lilac"
+    }
+  },
+  "block/pink_tulip": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/pink_tulip"
+    }
+  },
+  "block/allium": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/allium"
+    }
+  },
+  "block/lantern": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/lantern"
+    }
+  },
+  "block/sea_lantern": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/sea_lantern"
+    }
+  },
+  "block/glowstone": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/glowstone"
+    }
+  },
+  "block/chain": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/chain"
+    }
+  },
+  "block/iron_bars": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/iron_bars"
+    }
+  },
+  "block/chest": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/chest"
+    }
+  },
+  "block/crafting_table": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/crafting_table"
+    }
+  },
+  "block/bookshelf": {
+    "parent": "block/cube_all",
+    "textures": {
+      "all": "block/bookshelf"
+    }
+  }
+}
