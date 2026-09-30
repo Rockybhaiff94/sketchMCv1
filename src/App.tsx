@@ -56,6 +56,7 @@ import { MinecraftVersionModal } from './components/editor/MinecraftVersionModal
 import { buildNeutral3DModel } from './lib/geometry/neutralModelBuilder.ts';
 import { CandidateSolver } from './lib/reconstruction/candidateSolver.ts';
 import { ConstructionPatternDatabase } from './lib/schematics/patternDatabase.ts';
+import { UniversalReconstructor } from './lib/reconstruction/universalReconstructor.ts';
 
 type AppTab = 'workbench' | 'gallery';
 type RightPanelTab = 'palette' | 'inspector';
@@ -318,15 +319,17 @@ export default function App() {
           customPrompt: 'Calibrate facade and verify depth layers',
         }),
       });
-      const data = await response.json();
-      if (data.success && data.project) {
-        setCurrentProject(data.project);
-        if (data.councilReports) setCouncilReports(data.councilReports);
-        if (data.project.candidateSolutions) setCandidateSolutions(data.project.candidateSolutions);
-        if (data.project.neutralModel) setNeutralModel(data.project.neutralModel);
-        if (data.project.depthModel) setDepthModel(data.project.depthModel);
-        if (data.project.currentBuild) {
-          pushHistory(data.project.currentBuild);
+      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        const data = await response.json();
+        if (data.success && data.project) {
+          setCurrentProject(data.project);
+          if (data.councilReports) setCouncilReports(data.councilReports);
+          if (data.project.candidateSolutions) setCandidateSolutions(data.project.candidateSolutions);
+          if (data.project.neutralModel) setNeutralModel(data.project.neutralModel);
+          if (data.project.depthModel) setDepthModel(data.project.depthModel);
+          if (data.project.currentBuild) {
+            pushHistory(data.project.currentBuild);
+          }
         }
       }
     } catch (err: any) {
@@ -429,21 +432,50 @@ export default function App() {
         setProcessingStep('Executing 6-step iterative render-vs-reference calibration...');
       }, 1200);
 
-      const response = await fetch('/api/reconstruct', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          images: data.images,
-          presetId: data.presetId,
-          settings: data.settings,
-          scale: data.settings?.customScaleMultiplier || 1.0,
-          version: data.settings?.minecraftVersion || selectedVersion,
-        }),
-      });
+      let resData: any = null;
 
-      const resData = await response.json();
-      if (!response.ok || !resData.success) {
-        throw new Error(resData.error || resData.details || 'Failed reconstruction');
+      try {
+        const response = await fetch('/api/reconstruct', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            images: data.images,
+            presetId: data.presetId,
+            settings: data.settings,
+            scale: data.settings?.customScaleMultiplier || 1.0,
+            version: data.settings?.minecraftVersion || selectedVersion,
+          }),
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        if (response.ok && contentType.includes('application/json')) {
+          resData = await response.json();
+        } else {
+          console.warn(`Backend returned non-OK or non-JSON status ${response.status} (${contentType})`);
+        }
+      } catch (fetchErr) {
+        console.warn('Backend /api/reconstruct unreachable, running local client-side reconstruction engine:', fetchErr);
+      }
+
+      // If backend did not respond with success (e.g. Vercel static deployment or offline),
+      // seamlessly execute client-side universal reconstruction!
+      if (!resData || !resData.success) {
+        console.info('Executing client-side UniversalReconstructor engine fallback...');
+        const clientRes = await UniversalReconstructor.reconstruct(
+          data.images || [],
+          data.settings || {
+            minecraftVersion: selectedVersion,
+            customScaleMultiplier: 1.0,
+          }
+        );
+        resData = {
+          success: true,
+          build: clientRes.build,
+          semanticSubject: clientRes.semanticSubject,
+          fidelityReport: clientRes.fidelityReport,
+          councilReports: clientRes.councilReports,
+          validation: clientRes.validation,
+        };
       }
 
       setProcessingProgress(100);
@@ -490,9 +522,11 @@ export default function App() {
           prompt: promptQuery,
         }),
       });
-      const data = await response.json();
-      if (data.success && data.updatedBuild) {
-        pushHistory(data.updatedBuild);
+      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        const data = await response.json();
+        if (data.success && data.updatedBuild) {
+          pushHistory(data.updatedBuild);
+        }
       }
     } catch (err) {
       console.error('Prompt edit failed:', err);
