@@ -57,6 +57,19 @@ import { buildNeutral3DModel } from './lib/geometry/neutralModelBuilder.ts';
 import { CandidateSolver } from './lib/reconstruction/candidateSolver.ts';
 import { ConstructionPatternDatabase } from './lib/schematics/patternDatabase.ts';
 import { UniversalReconstructor } from './lib/reconstruction/universalReconstructor.ts';
+import {
+  createReconstructionIdentity,
+  setCurrentReconstructionId,
+  isResultStale,
+  buildCacheKey,
+  getCachedResult,
+  setCachedResult,
+  addToHistory,
+  getReconstructionHistory,
+  computeImageHash,
+  type ReconstructionIdentity,
+  type ReconstructionHistoryEntry,
+} from './lib/reconstruction/reconstructionContext.ts';
 
 type AppTab = 'workbench' | 'gallery';
 type RightPanelTab = 'palette' | 'inspector';
@@ -412,25 +425,45 @@ export default function App() {
   };
 
   // Start Multi-Stage AI Reconstruction Job
+  // Uses reconstruction identity to prevent race conditions and preserve history.
   const handleStartReconstruction = async (data: {
     images: ReferenceImageItem[];
     presetId?: string;
     settings: ReconstructionSettings;
   }) => {
     setIsProcessing(true);
-    setProcessingProgress(15);
-    setProcessingStep('Analyzing silhouette, facade bays, and stepped arches...');
+    setProcessingProgress(10);
+    setProcessingStep('Creating reconstruction identity...');
 
     try {
-      setTimeout(() => {
-        setProcessingProgress(45);
-        setProcessingStep('Solving 3D architectural proxy and proportion alignment...');
-      }, 500);
+      // 1. Create unique reconstruction identity from image content hash
+      const primaryImage = data.images[0];
+      const imageData = primaryImage?.dataUrl || `preset:${data.presetId || 'none'}`;
+      const version = data.settings?.minecraftVersion || selectedVersion;
+      const identity = await createReconstructionIdentity(imageData, version);
+      setCurrentReconstructionId(identity.reconstructionId);
 
-      setTimeout(() => {
-        setProcessingProgress(75);
-        setProcessingStep('Executing 6-step iterative render-vs-reference calibration...');
-      }, 1200);
+      // 2. Check cache for identical reconstruction
+      const cacheKey = buildCacheKey({
+        imageHash: identity.imageHash,
+        minecraftVersion: version,
+        scale: data.settings?.customScaleMultiplier || 1.0,
+        mode: data.settings?.referenceMode || 'architecture_environment',
+        quality: data.settings?.accuracy || 'high_detail',
+        pipelineVersion: identity.pipelineVersion,
+      });
+
+      const cached = getCachedResult(cacheKey);
+      if (cached) {
+        console.info('Cache hit for identical reconstruction parameters');
+        if (!isResultStale(identity.reconstructionId)) {
+          applyReconstructionResult(cached, identity);
+        }
+        return;
+      }
+
+      setProcessingProgress(15);
+      setProcessingStep('Analyzing reference image...');
 
       let resData: any = null;
 
@@ -443,7 +476,8 @@ export default function App() {
             presetId: data.presetId,
             settings: data.settings,
             scale: data.settings?.customScaleMultiplier || 1.0,
-            version: data.settings?.minecraftVersion || selectedVersion,
+            version,
+            reconstructionId: identity.reconstructionId,
           }),
         });
 
@@ -457,14 +491,22 @@ export default function App() {
         console.warn('Backend /api/reconstruct unreachable, running local client-side reconstruction engine:', fetchErr);
       }
 
-      // If backend did not respond with success (e.g. Vercel static deployment or offline),
-      // seamlessly execute client-side universal reconstruction!
+      // Stale check: if user uploaded another image while we were waiting, abort
+      if (isResultStale(identity.reconstructionId)) {
+        console.info(`Reconstruction ${identity.reconstructionId} is stale, discarding result`);
+        setIsProcessing(false);
+        return;
+      }
+
+      // If backend did not respond with success, run client-side fallback
       if (!resData || !resData.success) {
+        setProcessingProgress(45);
+        setProcessingStep('Running client-side reconstruction engine...');
         console.info('Executing client-side UniversalReconstructor engine fallback...');
         const clientRes = await UniversalReconstructor.reconstruct(
           data.images || [],
           data.settings || {
-            minecraftVersion: selectedVersion,
+            minecraftVersion: version,
             customScaleMultiplier: 1.0,
           }
         );
@@ -478,35 +520,76 @@ export default function App() {
         };
       }
 
+      // Second stale check after async work
+      if (isResultStale(identity.reconstructionId)) {
+        console.info(`Reconstruction ${identity.reconstructionId} is stale after processing, discarding`);
+        setIsProcessing(false);
+        return;
+      }
+
+      // Cache the result for identical future requests
+      setCachedResult(cacheKey, resData);
+
       setProcessingProgress(100);
       setProcessingStep('Reconstruction complete!');
 
       setTimeout(() => {
-        setIsProcessing(false);
-        setIsUploadModalOpen(false);
-        const newBuild = resData.build as MinecraftBuild;
-        setCurrentBuild(newBuild);
-        setHistory([newBuild]);
-        setHistoryIndex(0);
-        setCurrentLayerSlice(Math.max(1, newBuild.dimensions.height));
-        setSelectedVersion(newBuild.version);
-        setActiveTab('workbench');
-
-        // Store Multi-Agent Council & Neutral 3D Model outputs
-        if (resData.councilReports) setCouncilReports(resData.councilReports);
-        if (resData.candidateSolutions) setCandidateSolutions(resData.candidateSolutions);
-        if (resData.neutralModel) setNeutralModel(resData.neutralModel);
-        if (resData.depthModel) setDepthModel(resData.depthModel);
-        if (resData.project) setCurrentProject(resData.project);
-
-        if (newBuild.metadata.referenceBuilding) {
-          setIsAnalysisPanelOpen(true);
+        // Final stale check before applying to UI
+        if (isResultStale(identity.reconstructionId)) {
+          setIsProcessing(false);
+          return;
         }
+        applyReconstructionResult(resData, identity);
       }, 400);
     } catch (err: any) {
       console.error(err);
       alert(`Reconstruction error: ${err.message}`);
       setIsProcessing(false);
+    }
+  };
+
+  // Apply a reconstruction result to the UI state.
+  // Preserves history instead of wiping it.
+  const applyReconstructionResult = (resData: any, identity: ReconstructionIdentity) => {
+    setIsProcessing(false);
+    setIsUploadModalOpen(false);
+    const newBuild = resData.build as MinecraftBuild;
+
+    // Stamp the build with its reconstruction identity
+    newBuild.id = identity.buildId;
+    (newBuild.metadata as any).reconstructionId = identity.reconstructionId;
+    (newBuild.metadata as any).imageHash = identity.imageHash;
+    (newBuild.metadata as any).pipelineVersion = identity.pipelineVersion;
+
+    // PRESERVE history: push new build onto existing history instead of wiping
+    pushHistory(newBuild);
+    setCurrentLayerSlice(Math.max(1, newBuild.dimensions.height));
+    setSelectedVersion(newBuild.version);
+    setActiveTab('workbench');
+
+    // Store Multi-Agent Council & Neutral 3D Model outputs
+    if (resData.councilReports) setCouncilReports(resData.councilReports);
+    if (resData.candidateSolutions) setCandidateSolutions(resData.candidateSolutions);
+    if (resData.neutralModel) setNeutralModel(resData.neutralModel);
+    if (resData.depthModel) setDepthModel(resData.depthModel);
+    if (resData.project) setCurrentProject(resData.project);
+
+    // Add to reconstruction history (immutable)
+    const fidelity = resData.fidelityReport;
+    addToHistory({
+      identity,
+      sourceImageName: newBuild.name,
+      buildName: newBuild.name,
+      blockCount: newBuild.blocks.length,
+      status: fidelity?.status === 'SUCCESS' ? 'COMPLETED'
+        : fidelity?.status === 'NEEDS_ITERATION' ? 'NEEDS_ITERATION'
+        : fidelity?.status === 'FIDELITY_MISMATCH' ? 'APPROXIMATE'
+        : 'COMPLETED',
+      createdAt: new Date().toISOString(),
+    });
+
+    if (newBuild.metadata.referenceBuilding) {
+      setIsAnalysisPanelOpen(true);
     }
   };
 

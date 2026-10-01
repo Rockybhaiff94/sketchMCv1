@@ -68,28 +68,35 @@ export function buildMinecraftFromProxy(
     placedMap.delete(`${x},${y},${z}`);
   };
 
-  // Dimensional Proportions (Authentic to Zaypixel Glass Garden)
-  // Building is 19 blocks wide (-9 to +9), depth 21 (-10 to +10), wall height 5, roof apex 10
-  const halfW = 9;
-  const halfD = 9;
+  // Dimensional Proportions — derived from reference parameter, NOT hardcoded
+  const refWidth = reference.overallWidth || 21;
+  const refDepth = reference.estimatedDepth || 21;
+  const refHeight = reference.overallHeight || 13;
+  const halfW = Math.max(4, Math.round((refWidth * scale) / 2));
+  const halfD = Math.max(4, Math.round((refDepth * scale) / 2));
   const frontZ = halfD;
   const backZ = -halfD;
-  const wallHeight = 5;
-  const roofApexY = 10;
+  const wallHeight = Math.max(4, Math.round(refHeight * 0.45 * scale));
+  const roofApexY = Math.max(wallHeight + 2, Math.round(refHeight * scale));
 
-  // Key Palette Materials
-  const frameBlock = 'minecraft:smooth_quartz';
-  const frameStairs = 'minecraft:smooth_quartz_stairs';
-  const frameSlab = 'minecraft:smooth_quartz_slab';
-  const baseBlock = 'minecraft:stone_bricks';
-  const baseStairs = 'minecraft:stone_brick_stairs';
-  const baseSlab = 'minecraft:stone_brick_slab';
+  // Key Palette Materials — derived from reference material mapping when available
+  const findMaterial = (feature: string, fallback: string): string => {
+    const mapping = reference.materialMapping?.find(m => m.referenceFeature.toLowerCase().includes(feature.toLowerCase()));
+    return mapping?.bestBlockId || fallback;
+  };
+  const frameBlock = findMaterial('framework', findMaterial('columns', 'minecraft:smooth_quartz'));
+  const frameStairs = frameBlock.includes('quartz') ? 'minecraft:smooth_quartz_stairs' : 'minecraft:stone_brick_stairs';
+  const frameSlab = frameBlock.includes('quartz') ? 'minecraft:smooth_quartz_slab' : 'minecraft:stone_brick_slab';
+  const baseBlock = findMaterial('skirting', 'minecraft:stone_bricks');
+  const baseStairs = baseBlock.includes('stone_brick') ? 'minecraft:stone_brick_stairs' : 'minecraft:cobblestone_stairs';
+  const baseSlab = baseBlock.includes('stone_brick') ? 'minecraft:stone_brick_slab' : 'minecraft:cobblestone_slab';
   const mudBlock = 'minecraft:mud_bricks';
-  const lowerGlass = 'minecraft:light_blue_stained_glass';
-  const canopyGlass = 'minecraft:pink_stained_glass';
+  const lowerGlass = findMaterial('lower', findMaterial('window', 'minecraft:light_blue_stained_glass'));
+  const canopyGlass = findMaterial('vault', findMaterial('canopy', 'minecraft:pink_stained_glass'));
   const whiteGlass = 'minecraft:white_stained_glass';
   const clearPane = 'minecraft:glass_pane';
-  const doorBlock = version === '1.21' ? 'minecraft:oxidized_copper_door' : 'minecraft:copper_door';
+  const doorMaterial = findMaterial('door', version === '1.21' ? 'minecraft:oxidized_copper_door' : 'minecraft:copper_door');
+  const doorBlock = doorMaterial;
 
   // -------------------------------------------------------------------
   // 1. FOUNDATION & INTERIOR FLOOR (Y = 0 and Y = 1)
@@ -122,12 +129,10 @@ export function buildMinecraftFromProxy(
   // -------------------------------------------------------------------
   // 2. 4 STRUCTURAL QUARTZ COLUMNS & ENTABLATURE BEAM
   // -------------------------------------------------------------------
-  // Dividing the facade into 3 symmetrical 5-block bays:
-  // Col 0: x = -9 (Outer Left)
-  // Col 1: x = -3 (Inner Left)
-  // Col 2: x = +3 (Inner Right)
-  // Col 3: x = +9 (Outer Right)
-  const colPositionsX = [-9, -3, 3, 9];
+  // Derive column X positions from reference if available, otherwise symmetric division
+  const colPositionsX = (reference.columns && reference.columns.length > 0)
+    ? reference.columns.map(c => Math.round(c.x * scale))
+    : [-halfW, -Math.round(halfW * 0.35), Math.round(halfW * 0.35), halfW];
 
   colPositionsX.forEach((colX) => {
     // Front columns
@@ -337,27 +342,27 @@ export function buildMinecraftFromProxy(
     // Hanging luminous lanterns from the central ridge beam
     for (const lz of [-5, 0, 5]) {
       if (lz > backZ && lz < frontZ) {
-        put('minecraft:chain', 0, 9, lz, { axis: 'y' }, 'inferred');
-        put('minecraft:lantern', 0, 8, lz, { hanging: 'true' }, 'inferred');
+        put('minecraft:chain', 0, 9, lz, { axis: 'y' }, 'generated');
+        put('minecraft:lantern', 0, 8, lz, { hanging: 'true' }, 'generated');
       }
     }
 
     // Interior plant display benches along both side walls
     for (let z = backZ + 2; z <= frontZ - 2; z += 2) {
       // Left plant bench
-      put('minecraft:spruce_slab', -7, 1, z, { type: 'bottom' }, 'inferred');
-      put('minecraft:flowering_azalea_leaves', -7, 2, z, undefined, 'inferred');
+      put('minecraft:spruce_slab', -7, 1, z, { type: 'bottom' }, 'generated');
+      put('minecraft:flowering_azalea_leaves', -7, 2, z, undefined, 'generated');
       // Right plant bench
-      put('minecraft:spruce_slab', 7, 1, z, { type: 'bottom' }, 'inferred');
-      put('minecraft:peony', 7, 2, z, undefined, 'inferred');
+      put('minecraft:spruce_slab', 7, 1, z, { type: 'bottom' }, 'generated');
+      put('minecraft:peony', 7, 2, z, undefined, 'generated');
     }
 
     // Central garden planting bed
     for (let z = -2; z <= 2; z++) {
-      put('minecraft:moss_block', -1, 1, z, undefined, 'inferred');
-      put('minecraft:moss_block', 1, 1, z, undefined, 'inferred');
-      put('minecraft:flowering_azalea_leaves', -1, 2, z, undefined, 'inferred');
-      put('minecraft:pink_tulip', 1, 2, z, undefined, 'inferred');
+      put('minecraft:moss_block', -1, 1, z, undefined, 'generated');
+      put('minecraft:moss_block', 1, 1, z, undefined, 'generated');
+      put('minecraft:flowering_azalea_leaves', -1, 2, z, undefined, 'generated');
+      put('minecraft:pink_tulip', 1, 2, z, undefined, 'generated');
     }
   }
 
@@ -523,11 +528,15 @@ export function buildMinecraftFromProxy(
   }
 
   const total = solvedBlocks.length || 1;
-  const provenanceSummary = {
+  const provenanceBreakdown = {
+    observedCount,
+    inferredCount,
+    generatedCount,
     observedPercent: Math.round((observedCount / total) * 100),
     inferredPercent: Math.round((inferredCount / total) * 100),
     generatedPercent: Math.round((generatedCount / total) * 100),
   };
+  const provenanceSummary = provenanceBreakdown;
 
   return {
     id: `build_${Date.now()}`,
@@ -541,6 +550,20 @@ export function buildMinecraftFromProxy(
     blocks: solvedBlocks,
     metadata: {
       style: 'Glass Conservatory Pavilion',
+      structureType: 'greenhouse',
+      hasInteriorSpace: true,
+      rooms: [
+        {
+          id: 'room_greenhouse_main',
+          name: 'Planting & Conservatory Hall',
+          type: 'planting_bay',
+          bounds: { xMin: -halfW + 1, xMax: halfW - 1, yMin: 1, yMax: wallHeight, zMin: backZ + 1, zMax: frontZ - 1 },
+          provenance: 'generated',
+          confidence: 0.70,
+          features: ['Central Stone Aisle', 'Raised Farmland Beds', 'Hanging Lanterns', 'Botanical Planters'],
+        },
+      ],
+      provenanceBreakdown,
       scale,
       confidence: {
         overall: 0.98,

@@ -1,7 +1,14 @@
 import React from 'react';
 import { BlockPlacement } from '../../types/minecraft.ts';
-import { getMinecraftBlock } from '../../lib/registry.ts';
-import { Sliders, Box, Layers, Compass, CheckCircle2, RotateCw, Trash2 } from 'lucide-react';
+import {
+  getMinecraftBlock,
+  resolveBlockModel,
+  resolveBlockTexture,
+  MINECRAFT_VERSION,
+  REGISTRY_SNAPSHOT_ID,
+} from '../../lib/registry.ts';
+import { getBlockPreviewThumbnail } from '../../lib/rendering/blockPreviewRenderer.ts';
+import { Sliders, Box, Layers, Compass, CheckCircle2, RotateCw, Trash2, Cpu } from 'lucide-react';
 
 interface BlockStateInspectorProps {
   selectedBlock: BlockPlacement | null;
@@ -34,6 +41,9 @@ export const BlockStateInspector: React.FC<BlockStateInspectorProps> = ({
   const properties = blockDef?.properties || {};
   const currentState = selectedBlock.state || {};
 
+  const resolvedModel = resolveBlockModel(selectedBlock.blockId, currentState);
+  const resolvedTexture = resolveBlockTexture(selectedBlock.blockId, currentState);
+
   const handleStateChange = (propKey: string, newValue: string) => {
     const updated = {
       ...currentState,
@@ -51,14 +61,16 @@ export const BlockStateInspector: React.FC<BlockStateInspectorProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-slate-900/90 text-slate-200 select-none overflow-y-auto">
-      {/* Block Header Card */}
+      {/* Block Header Card with Authentic 3D Preview */}
       <div className="p-3 border-b border-slate-800 bg-slate-950/40">
         <div className="flex items-start gap-3">
-          <div
-            className="w-10 h-10 rounded-lg border border-slate-700/80 flex items-center justify-center shadow-inner flex-shrink-0"
-            style={{ backgroundColor: blockDef?.colorHex || '#475569' }}
-          >
-            <Box className="w-5 h-5 text-white/90 drop-shadow" />
+          <div className="w-12 h-12 rounded-lg border border-slate-700/80 bg-slate-950 flex items-center justify-center shadow-inner flex-shrink-0 overflow-hidden p-1">
+            <img
+              src={getBlockPreviewThumbnail(selectedBlock.blockId, currentState, 96)}
+              alt={blockName}
+              className="w-10 h-10 object-contain"
+              style={{ imageRendering: 'pixelated' }}
+            />
           </div>
 
           <div className="flex-1 min-w-0">
@@ -76,6 +88,40 @@ export const BlockStateInspector: React.FC<BlockStateInspectorProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Minecraft Technical Metadata Inspector */}
+      <div className="px-3 py-2 border-b border-slate-800/80 bg-slate-950/60 space-y-1 text-[10px] font-mono">
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Version:</span>
+          <span className="text-emerald-400 font-semibold">{MINECRAFT_VERSION} (Java Edition)</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Model:</span>
+          <span className="text-cyan-300 truncate max-w-[190px]" title={resolvedModel}>
+            {resolvedModel}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Texture:</span>
+          <span className="text-amber-300 truncate max-w-[190px]" title={resolvedTexture}>
+            {resolvedTexture}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Source:</span>
+          <span className="text-slate-300 truncate max-w-[190px]" title={`Minecraft Asset Registry (${REGISTRY_SNAPSHOT_ID})`}>
+            VoxelForge Java Registry
+          </span>
+        </div>
+        {Object.keys(currentState).length > 0 && (
+          <div className="pt-1 border-t border-slate-800/60 flex items-start justify-between">
+            <span className="text-slate-400">State:</span>
+            <span className="text-slate-300 text-right font-medium">
+              {Object.entries(currentState).map(([k, v]) => `${k}=${v}`).join(', ')}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* State Properties Editor */}

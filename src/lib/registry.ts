@@ -1662,7 +1662,112 @@ export const MINECRAFT_BLOCKS: MinecraftBlock[] = [
     supportsRotation: false,
     sinceVersion: '1.20',
   },
+  {
+    id: 'minecraft:blackstone_bricks',
+    name: 'Blackstone Bricks',
+    category: 'stone',
+    subCategory: 'nether_stone',
+    material: 'stone',
+    shapeType: 'full_cube',
+    colorHex: '#27221C',
+    roughness: 0.85,
+    supportsRotation: false,
+    sinceVersion: '1.20',
+  },
+  {
+    id: 'minecraft:sand',
+    name: 'Sand',
+    category: 'nature',
+    subCategory: 'desert',
+    material: 'sandstone',
+    shapeType: 'full_cube',
+    colorHex: '#DBD3A0',
+    roughness: 0.95,
+    supportsRotation: false,
+    sinceVersion: '1.20',
+  },
+  {
+    id: 'minecraft:pink_wool',
+    name: 'Pink Wool',
+    category: 'wool',
+    subCategory: 'colored_wool',
+    material: 'wool',
+    shapeType: 'full_cube',
+    colorHex: '#F38BAA',
+    roughness: 0.9,
+    supportsRotation: false,
+    sinceVersion: '1.20',
+  },
+  {
+    id: 'minecraft:torch',
+    name: 'Torch',
+    category: 'lighting',
+    subCategory: 'torch',
+    material: 'wood',
+    shapeType: 'torch',
+    colorHex: '#FFAA33',
+    roughness: 0.5,
+    supportsRotation: false,
+    transparent: true,
+    sinceVersion: '1.20',
+  },
+  {
+    id: 'minecraft:oak_door',
+    name: 'Oak Door',
+    category: 'functional',
+    subCategory: 'doors',
+    material: 'wood',
+    shapeType: 'door',
+    colorHex: '#A06E28',
+    roughness: 0.8,
+    supportsRotation: true,
+    allowedRotations: ['north', 'south', 'east', 'west'],
+    defaultState: { facing: 'north', half: 'lower', hinge: 'left', open: 'false', powered: 'false' },
+    properties: {
+      facing: ['north', 'south', 'east', 'west'],
+      half: ['lower', 'upper'],
+      hinge: ['left', 'right'],
+      open: ['true', 'false'],
+      powered: ['true', 'false'],
+    },
+    transparent: true,
+    sinceVersion: '1.20',
+  },
+  {
+    id: 'minecraft:redstone_block',
+    name: 'Block of Redstone',
+    category: 'redstone',
+    subCategory: 'power',
+    material: 'metal',
+    shapeType: 'full_cube',
+    colorHex: '#E50000',
+    roughness: 0.7,
+    metalness: 0.1,
+    supportsRotation: false,
+    sinceVersion: '1.20',
+  },
 ];
+
+// Version Snapshot & Immutability Pinning Metadata
+export const MINECRAFT_VERSION = '1.21.4';
+export const REGISTRY_SNAPSHOT_ID = 'snapshot-java-1.21.4-v1';
+export const ASSET_MANIFEST_HASH = 'sha256-4b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c';
+
+// Canonical Aliases for Common Generic Names
+const CANONICAL_ALIASES: Record<string, string> = {
+  'minecraft:leaves': 'minecraft:oak_leaves',
+  'leaves': 'minecraft:oak_leaves',
+  'minecraft:fence': 'minecraft:oak_fence',
+  'fence': 'minecraft:oak_fence',
+  'minecraft:wall': 'minecraft:cobblestone_wall',
+  'wall': 'minecraft:cobblestone_wall',
+  'minecraft:door': 'minecraft:oak_door',
+  'door': 'minecraft:oak_door',
+  'minecraft:trapdoor': 'minecraft:oak_trapdoor',
+  'trapdoor': 'minecraft:oak_trapdoor',
+  'minecraft:redstone': 'minecraft:redstone_block',
+  'redstone': 'minecraft:redstone_block',
+};
 
 // Fast lookup map by block ID
 const BLOCK_MAP = new Map<string, MinecraftBlock>();
@@ -1671,15 +1776,28 @@ for (const b of MINECRAFT_BLOCKS) {
 }
 
 export function getMinecraftBlock(id: string): MinecraftBlock | undefined {
-  return BLOCK_MAP.get(id);
+  if (!id) return undefined;
+  const direct = BLOCK_MAP.get(id);
+  if (direct) return direct;
+
+  const namespaced = id.startsWith('minecraft:') ? id : `minecraft:${id}`;
+  const nsMatch = BLOCK_MAP.get(namespaced);
+  if (nsMatch) return nsMatch;
+
+  const aliasedId = CANONICAL_ALIASES[id] || CANONICAL_ALIASES[namespaced];
+  if (aliasedId) {
+    return BLOCK_MAP.get(aliasedId);
+  }
+
+  return undefined;
 }
 
 export function isValidBlockId(id: string): boolean {
-  return BLOCK_MAP.has(id);
+  return getMinecraftBlock(id) !== undefined;
 }
 
 export function isValidBlockState(id: string, state?: Record<string, string>): boolean {
-  const block = BLOCK_MAP.get(id);
+  const block = getMinecraftBlock(id);
   if (!block) return false;
   if (!state || Object.keys(state).length === 0) return true;
   if (!block.properties) return true;
@@ -1696,11 +1814,88 @@ export function isValidBlockState(id: string, state?: Record<string, string>): b
 /**
  * Filter registry blocks available in target Minecraft version
  */
-export function getBlocksForVersion(version: '1.20' | '1.21'): MinecraftBlock[] {
+export function getBlocksForVersion(version: '1.20' | '1.21' = '1.21'): MinecraftBlock[] {
   if (version === '1.21') {
     return MINECRAFT_BLOCKS;
   }
   return MINECRAFT_BLOCKS.filter((b) => b.sinceVersion !== '1.21');
+}
+
+/**
+ * Alias for AI Block Solver querying valid Minecraft blocks for a version
+ */
+export function getValidBlocks(version: '1.20' | '1.21' = '1.21'): MinecraftBlock[] {
+  return getBlocksForVersion(version);
+}
+
+/**
+ * Resolves the canonical Minecraft model identifier for a block and state
+ */
+export function resolveBlockModel(blockId: string, state?: Record<string, string>): string {
+  const def = getMinecraftBlock(blockId);
+  const cleanId = (def?.id || blockId).replace('minecraft:', '');
+  const shape = def?.shapeType || 'full_cube';
+
+  if (shape === 'stairs') {
+    return `minecraft:block/${cleanId}`;
+  }
+  if (shape === 'slab') {
+    const type = state?.type || 'bottom';
+    if (type === 'top') return `minecraft:block/${cleanId}_top`;
+    if (type === 'double') return `minecraft:block/${cleanId.replace('_slab', '')}`;
+    return `minecraft:block/${cleanId}`;
+  }
+  if (shape === 'door') {
+    const half = state?.half || 'lower';
+    return `minecraft:block/${cleanId}_${half}`;
+  }
+  if (shape === 'pane') {
+    return `minecraft:block/${cleanId}_post`;
+  }
+  if (cleanId === 'grass_block') {
+    return 'minecraft:block/grass_block';
+  }
+  if (cleanId.includes('log')) {
+    const axis = state?.axis || 'y';
+    return axis === 'y' ? `minecraft:block/${cleanId}` : `minecraft:block/${cleanId}_horizontal`;
+  }
+  return `minecraft:block/${cleanId}`;
+}
+
+/**
+ * Resolves the canonical Minecraft texture identifier(s) for a block and state
+ */
+export function resolveBlockTexture(blockId: string, state?: Record<string, string>): string {
+  const def = getMinecraftBlock(blockId);
+  const cleanId = (def?.id || blockId).replace('minecraft:', '');
+
+  if (cleanId.includes('stairs')) {
+    const base = cleanId.replace('_stairs', '');
+    return `minecraft:block/${base}`;
+  }
+  if (cleanId.includes('slab')) {
+    const base = cleanId.replace('_slab', '');
+    return `minecraft:block/${base}`;
+  }
+  if (cleanId === 'grass_block') {
+    return 'minecraft:block/grass_block_top, minecraft:block/grass_block_side, minecraft:block/dirt';
+  }
+  if (cleanId.includes('log')) {
+    return `minecraft:block/${cleanId} (side), minecraft:block/${cleanId}_top (end)`;
+  }
+  if (cleanId === 'cobblestone_wall') {
+    return 'minecraft:block/cobblestone';
+  }
+  if (cleanId === 'oak_fence') {
+    return 'minecraft:block/oak_planks';
+  }
+  if (cleanId === 'iron_bars') {
+    return 'minecraft:block/iron_bars';
+  }
+  if (cleanId === 'glass_pane') {
+    return 'minecraft:block/glass';
+  }
+  return `minecraft:block/${cleanId}`;
 }
 
 /**

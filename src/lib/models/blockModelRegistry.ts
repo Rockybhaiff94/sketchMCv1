@@ -132,7 +132,16 @@ function createTrapdoorGeometry(open: boolean = false, half: string = 'bottom'):
 }
 
 /**
- * Creates Minecraft Cross-Quad geometry for Torches, Flowers, Saplings, Plants
+ * Creates Minecraft Torch geometry: vertical 2x10x2 voxel stick (0.125 x 0.625 x 0.125)
+ */
+function createTorchGeometry(): THREE.BufferGeometry {
+  const stick = new THREE.BoxGeometry(0.125, 0.625, 0.125);
+  stick.translate(0, -0.1875, 0);
+  return stick;
+}
+
+/**
+ * Creates Minecraft Cross-Quad geometry for Flowers, Saplings, Tall Grass, Plants
  * Two vertical double-sided quads intersecting at 90 degrees (45 deg angle)
  */
 function createCrossQuadGeometry(): THREE.BufferGeometry {
@@ -263,8 +272,10 @@ export function getBlockGeometry(
     case 'trapdoor':
       geo = createTrapdoorGeometry(openKey === 'true', halfKey);
       break;
-    case 'plant':
     case 'torch':
+      geo = createTorchGeometry();
+      break;
+    case 'plant':
       geo = createCrossQuadGeometry();
       break;
     default:

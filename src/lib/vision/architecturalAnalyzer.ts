@@ -33,12 +33,10 @@ export function analyzeReferenceArchitecture(
   const version = settings?.minecraftVersion || '1.21';
   const imageNameLower = (primaryImage.name || '').toLowerCase();
 
-  // Check if image is the Glass Garden reference
+  // Check if image is specifically the Glass Garden reference
   const isGlassGarden =
-    imageNameLower.includes('glass') ||
-    imageNameLower.includes('garden') ||
-    imageNameLower.includes('conservatory') ||
-    imageNameLower.includes('greenhouse');
+    imageNameLower.includes('glass') && imageNameLower.includes('garden') ||
+    imageNameLower.includes('conservatory');
 
   // Multi-view inspection
   const hasInteriorView = additionalImages.some(
@@ -51,10 +49,10 @@ export function analyzeReferenceArchitecture(
     (img) => (img.userAssignedView || img.probableView) === 'top'
   );
 
-  // Scaled dimensions (discrete blocks)
-  const baseWidth = isGlassGarden ? 21 : 19;
-  const baseHeight = isGlassGarden ? 13 : 14;
-  const baseDepth = hasSideView ? 23 : 19;
+  // Scaled dimensions — sensible defaults for unknown buildings, Glass Garden specifics when matched
+  const baseWidth = isGlassGarden ? 21 : 17;
+  const baseHeight = isGlassGarden ? 13 : 11;
+  const baseDepth = hasSideView ? 23 : isGlassGarden ? 19 : 15;
 
   const overallWidth = Math.max(13, Math.round(baseWidth * scale));
   const overallHeight = Math.max(10, Math.round(baseHeight * scale));
@@ -269,7 +267,7 @@ export function analyzeReferenceArchitecture(
 
   return {
     id: `ref_bld_${Date.now()}`,
-    name: isGlassGarden ? 'Glass Garden Conservatory' : 'Reconstructed Architectural Pavilion',
+    name: isGlassGarden ? 'Glass Garden Conservatory' : `Reconstructed Building (${(primaryImage.name || 'image').replace(/\.[^.]+$/, '')})`,
     overallWidth,
     overallHeight,
     estimatedDepth,

@@ -29,7 +29,7 @@ export function buildNeutral3DModel(
     {
       index: 0,
       depthMeters: 1.2 * scale,
-      description: 'Foreground Layer: Planting beds, path ribbon, exterior climbing vines',
+      description: 'Foreground Layer: Exterior landscaping, paths, approach elements',
       regionIds: ['foreground_curbed_flower_beds', 'foreground_climbing_vegetation', 'ground_approach_path'],
       isForeground: true,
       isInterior: false,
@@ -37,7 +37,7 @@ export function buildNeutral3DModel(
     {
       index: 1,
       depthMeters: 2.2 * scale,
-      description: 'Primary Structural Layer: Masonry pilasters, foundation skirting, architraves',
+      description: 'Primary Structural Layer: Vertical piers, foundation, structural frame',
       regionIds: ['facade_structural_columns', 'foundation_skirting', 'facade_arch_entrance'],
       isForeground: false,
       isInterior: false,
@@ -45,7 +45,7 @@ export function buildNeutral3DModel(
     {
       index: 2,
       depthMeters: 2.8 * scale,
-      description: 'Glazing & Opening Layer: Inset window bays, door leaf, iron glazing grids',
+      description: 'Glazing & Opening Layer: Inset window bays, door openings, window grids',
       regionIds: ['facade_left_window_bay', 'facade_right_window_bay', 'door_portal_infill'],
       isForeground: false,
       isInterior: false,
@@ -53,7 +53,7 @@ export function buildNeutral3DModel(
     {
       index: 3,
       depthMeters: 5.5 * scale,
-      description: 'Roof Vault & Interior Volume: Curved canopy vault, transverse arches, interior garden',
+      description: 'Roof & Interior Volume: Roof structure, interior space, transverse elements',
       regionIds: ['facade_glass_central_vault', 'interior_hall', 'canopy_ribs'],
       isForeground: false,
       isInterior: true,
@@ -61,7 +61,7 @@ export function buildNeutral3DModel(
     {
       index: 4,
       depthMeters: depthMeters,
-      description: 'Rear Structural Plane: Rear facade wall, rear archways, perimeter boundary',
+      description: 'Rear Structural Plane: Back wall, rear features, perimeter boundary',
       regionIds: ['rear_wall_plane', 'perimeter_boundary'],
       isForeground: false,
       isInterior: false,

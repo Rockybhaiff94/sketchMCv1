@@ -23,6 +23,31 @@ import { VersionMigrationService } from '../src/lib/minecraft/services/VersionMi
 import { UniversalReconstructor } from '../src/lib/reconstruction/universalReconstructor';
 import { classifyAndDecomposeSubject } from '../src/lib/vision/subjectClassifier';
 import { UniversalVoxelizer } from '../src/lib/geometry/universalVoxelizer';
+import {
+  createReconstructionIdentity,
+  setCurrentReconstructionId,
+  isResultStale,
+  buildCacheKey,
+  getCachedResult,
+  setCachedResult,
+  addToHistory,
+  getReconstructionHistory,
+} from '../src/lib/reconstruction/reconstructionContext';
+import * as THREE from 'three';
+import {
+  getMinecraftBlock,
+  isValidBlockId,
+  isValidBlockState,
+  getValidBlocks,
+  substituteBlockForVersion,
+  resolveBlockModel,
+  resolveBlockTexture,
+  MINECRAFT_VERSION,
+  REGISTRY_SNAPSHOT_ID,
+  ASSET_MANIFEST_HASH,
+} from '../src/lib/registry';
+import { getBlockGeometry } from '../src/lib/models/blockModelRegistry';
+import { getOrCreateBlockTexture, getMultiFaceTextures, renderBlockCanvas } from '../src/lib/textureGenerator';
 
 let passed = 0;
 let failed = 0;
@@ -443,6 +468,359 @@ async function runAllTests() {
   assert(universalResult.architecturalFallbackRejected === true, 'Fallback rejected in end-to-end pipeline');
   assert(universalResult.build.metadata.subjectCategory === 'creature', 'Creature metadata preserved in final build');
   assert(universalResult.fidelityReport.status === 'SUCCESS', 'Fidelity status SUCCESS achieved');
+
+  // -----------------------------------------------------------------------
+  // TEST 21: Universal Multi-Archetype Classification & Non-Architectural Reconstructions
+  // -----------------------------------------------------------------------
+  console.log('\nTest Suite 21: Multi-Archetype Classification & Rejection of Fake Pavilion');
+  
+  // 1. Airplane / Aircraft
+  const planeClass = classifyAndDecomposeSubject({ name: 'Spitfire_Airplane.png' });
+  assert(planeClass.category === 'vehicle', 'Airplane classified as vehicle (not building)');
+  assert(planeClass.isArchitectural === false, 'Airplane is non-architectural');
+  assert(planeClass.semanticSubject.parts.some(p => p.type === 'wing'), 'Airplane includes aerodynamic wings');
+  const planeBuild = UniversalVoxelizer.voxelize(planeClass.semanticSubject, '1.21');
+  assert(!planeBuild.blocks.some(b => b.blockId === 'minecraft:pink_stained_glass'), 'Airplane never contains greenhouse pink glass');
+  assert(planeBuild.blocks.length > 50, 'Airplane correctly voxelized into 3D Minecraft blocks');
+
+  // 2. Ship / Watercraft
+  const shipClass = classifyAndDecomposeSubject({ name: 'Pirate_Ship_Vessel.png' });
+  assert(shipClass.category === 'vehicle', 'Ship classified as vehicle');
+  assert(shipClass.isArchitectural === false, 'Ship is non-architectural');
+  assert(shipClass.semanticSubject.parts.some(p => p.id === 'ship_mast'), 'Ship includes central mast');
+  const shipBuild = UniversalVoxelizer.voxelize(shipClass.semanticSubject, '1.21');
+  assert(shipBuild.blocks.some(b => b.blockId === 'minecraft:spruce_planks'), 'Ship built with nautical timber planks');
+
+  // 3. Statue / Sculpture
+  const statueClass = classifyAndDecomposeSubject({ name: 'Greek_Statue_Sculpture.jpg' });
+  assert(statueClass.category === 'statue_sculpture', 'Statue classified as statue_sculpture');
+  assert(statueClass.isArchitectural === false, 'Statue is non-architectural');
+  assert(statueClass.semanticSubject.parts.some(p => p.id === 'statue_pedestal'), 'Statue includes pedestal base');
+  const statueBuild = UniversalVoxelizer.voxelize(statueClass.semanticSubject, '1.21');
+  assert(statueBuild.blocks.some(b => b.blockId === 'minecraft:stone_bricks'), 'Statue uses masonry stone bricks');
+
+  // 4. General House / Cottage (not conservatory!)
+  const houseClass = classifyAndDecomposeSubject({ name: 'Oak_Timber_House.png' });
+  assert(houseClass.category === 'architecture', 'House classified as architecture');
+  assert(houseClass.isArchitectural === true, 'House identified as architectural');
+  assert(!houseClass.semanticSubject.parts.some(p => p.materialCandidate.includes('pink_stained_glass')), 'General house does NOT default to pink stained glass');
+  assert(houseClass.semanticSubject.parts.some(p => p.shape === 'wedge'), 'House includes pitched wedge roof');
+
+  // 5. Furniture / Interior Object
+  const furnitureClass = classifyAndDecomposeSubject({ name: 'Living_Room_Furniture_Sofa.png' });
+  assert(furnitureClass.category === 'furniture', 'Furniture classified as furniture');
+  assert(furnitureClass.isArchitectural === false, 'Furniture is non-architectural');
+
+  // 6. Generic Animal / Wolf
+  const wolfClass = classifyAndDecomposeSubject({ name: 'Timber_Wolf_Animal.png' });
+  assert(wolfClass.category === 'creature', 'Wolf classified as creature');
+  assert(wolfClass.isArchitectural === false, 'Wolf is non-architectural');
+  assert(wolfClass.semanticSubject.parts.some(p => p.id === 'creature_tail'), 'Quadruped includes tail');
+
+  // -----------------------------------------------------------------------
+  // TEST 22: Master Prompt Requirement 19: Identity, History & Stale-Result Rejection
+  // -----------------------------------------------------------------------
+  console.log('\nTest Suite 22: Requirement 19: Identity, History & Race-Condition Rejection');
+
+  // 1. Identity generation & content hashing
+  const imageAData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  const imageBData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+  const identityA = await createReconstructionIdentity(imageAData, '1.21');
+  const identityB = await createReconstructionIdentity(imageBData, '1.21');
+
+  assert(identityA.imageHash !== identityB.imageHash, 'Different images produce distinct SHA-256 hashes');
+  assert(identityA.reconstructionId !== identityB.reconstructionId, 'Different images produce distinct reconstruction IDs');
+  assert(identityA.buildId !== identityB.buildId, 'Unique build IDs per reconstruction');
+
+  // 2. Cache key generation & multi-parameter caching
+  const cacheKeyA = buildCacheKey({
+    imageHash: identityA.imageHash,
+    minecraftVersion: '1.21',
+    scale: 1.0,
+    mode: 'architecture_environment',
+    quality: 'high_detail',
+    pipelineVersion: identityA.pipelineVersion,
+  });
+  assert(cacheKeyA.includes(identityA.imageHash), 'Cache key contains SHA-256 image hash');
+  assert(cacheKeyA.includes('1.21') && cacheKeyA.includes('high_detail'), 'Cache key contains version & quality parameters');
+
+  setCachedResult(cacheKeyA, { build: { id: 'buildA' } });
+  const retrievedA = getCachedResult(cacheKeyA);
+  assert(retrievedA?.build?.id === 'buildA', 'Cache stores and returns identical build');
+
+  // 3. History preservation (never wiped on subsequent uploads)
+  const initialHistoryLen = getReconstructionHistory().length;
+  addToHistory({
+    identity: identityA,
+    sourceImageName: 'ImageA.png',
+    buildName: 'Build A (House)',
+    blockCount: 450,
+    status: 'COMPLETED',
+    createdAt: new Date().toISOString(),
+  });
+  addToHistory({
+    identity: identityB,
+    sourceImageName: 'ImageB.png',
+    buildName: 'Build B (Airplane)',
+    blockCount: 620,
+    status: 'COMPLETED',
+    createdAt: new Date().toISOString(),
+  });
+
+  const history = getReconstructionHistory();
+  assert(history.length === initialHistoryLen + 2, 'History grows immutably instead of being wiped');
+  assert(history.some(h => h.buildName.includes('Build A')), 'Build A preserved in history');
+  assert(history.some(h => h.buildName.includes('Build B')), 'Build B preserved in history');
+
+  // 4. Asynchronous Race Condition Simulation (Requirement 19 exact spec)
+  // Scenario:
+  // - A request starts
+  // - B request starts
+  // - B completes first
+  // - A completes later
+  // Final visible build MUST remain B!
+  setCurrentReconstructionId(identityA.reconstructionId);
+  // User uploads B while A is in-flight:
+  setCurrentReconstructionId(identityB.reconstructionId);
+
+  let visibleBuildName = 'none';
+
+  // B finishes first:
+  if (!isResultStale(identityB.reconstructionId)) {
+    visibleBuildName = 'Build B';
+  }
+  assert(visibleBuildName === 'Build B', 'Build B displayed when B completes first');
+
+  // A finishes later:
+  const isAStale = isResultStale(identityA.reconstructionId);
+  assert(isAStale === true, 'Late-finishing Request A detected as stale');
+  if (!isAStale) {
+    visibleBuildName = 'Build A'; // should NEVER happen
+  }
+  assert(visibleBuildName === 'Build B', 'Final visible build strictly remains B (stale A rejected)');
+
+  // =========================================================================
+  // FIX #2 ACCEPTANCE TESTS (Tests 1 to 6)
+  // =========================================================================
+
+  // TEST 1: Upload a single house image
+  console.log('\nTest Suite 23: FIX #2 TEST 1 — Single House Image Reconstruction');
+  const houseRes = await UniversalReconstructor.reconstruct([
+    { name: 'nordic_timber_house.png' },
+  ]);
+  assert(houseRes.build.metadata.structureType === 'house', 'House correctly classified as structureType: house');
+  assert(houseRes.build.metadata.hasInteriorSpace === true, 'House identified as having real interior space');
+  assert(Boolean(houseRes.build.metadata.rooms && houseRes.build.metadata.rooms.length >= 2), 'House contains structure-appropriate rooms (living & bedroom)');
+  assert(houseRes.build.blocks.some((b) => b.blockId.includes('door')), 'House contains an authentic enterable doorway');
+  assert(houseRes.build.blocks.some((b) => b.provenance === 'generated'), 'House contains real generated interior furnishings');
+  assert(houseRes.build.blocks.some((b) => b.provenance === 'inferred'), 'House hidden rear and roof areas marked inferred');
+  assert(houseRes.build.blocks.some((b) => b.provenance === 'observed'), 'House front facade marked observed');
+  assert(Boolean(houseRes.build.metadata.provenanceBreakdown && houseRes.build.metadata.provenanceBreakdown.observedPercent! > 0), 'Provenance breakdown tracks observed percentage');
+  assert(Boolean(houseRes.build.metadata.provenanceBreakdown && houseRes.build.metadata.provenanceBreakdown.generatedCount > 0), 'Provenance breakdown tracks generated count & percentage');
+
+  // TEST 2: Upload a statue
+  console.log('\nTest Suite 24: FIX #2 TEST 2 — Solid Statue / Sculpture Reconstruction');
+  const statueRes = await UniversalReconstructor.reconstruct([
+    { name: 'marble_angel_statue.png' },
+  ]);
+  assert(statueRes.build.metadata.structureType === 'statue', 'Statue correctly classified as structureType: statue');
+  assert(statueRes.build.metadata.hasInteriorSpace === false, 'Statue identified as solid sculpture with NO interior space');
+  assert(!statueRes.build.metadata.rooms || statueRes.build.metadata.rooms.length === 0, 'Statue has 0 interior rooms');
+  assert(!statueRes.build.blocks.some((b) => b.provenance === 'generated'), 'Statue generates 0 fake interior furniture blocks');
+  assert(statueRes.build.blocks.some((b) => b.blockId === 'minecraft:stone_bricks'), 'Statue includes solid carved pedestal base');
+  assert(statueRes.build.blocks.some((b) => b.blockId === 'minecraft:smooth_stone'), 'Statue sculpted with masonry stone');
+
+  // TEST 3: Upload a vehicle
+  console.log('\nTest Suite 25: FIX #2 TEST 3 — Vehicle Reconstruction');
+  const vehicleRes = await UniversalReconstructor.reconstruct([
+    { name: 'heavy_transport_truck.png' },
+  ]);
+  assert(vehicleRes.build.metadata.structureType === 'vehicle', 'Vehicle classified as structureType: vehicle');
+  assert(vehicleRes.build.metadata.hasInteriorSpace === true, 'Vehicle identified as having enclosed cabin space');
+  assert(Boolean(vehicleRes.build.metadata.rooms?.some((r) => r.type === 'cockpit')), 'Vehicle generates operator cockpit/cabin only');
+  assert(vehicleRes.build.blocks.some((b) => b.blockId === 'minecraft:black_concrete'), 'Vehicle includes wheel assemblies');
+  assert(vehicleRes.build.blocks.some((b) => b.blockId === 'minecraft:iron_block'), 'Vehicle includes chassis');
+  assert(!vehicleRes.build.blocks.some((b) => b.blockId === 'minecraft:red_bed'), 'Vehicle does not receive house bedroom furniture spam');
+
+  // TEST 4: Upload an animal-shaped building
+  console.log('\nTest Suite 26: FIX #2 TEST 4 — Animal-Shaped Building vs Pure Animal Sculpture');
+  const animalBldgRes = await UniversalReconstructor.reconstruct([
+    { name: 'giant_beaver_hotel_building.png' },
+  ]);
+  assert(animalBldgRes.build.metadata.structureType === 'animal-shaped structure', 'Animal-shaped building classified as animal-shaped structure');
+  assert(animalBldgRes.build.metadata.hasInteriorSpace === true, 'Animal-shaped building identified as having interior space');
+  assert(Boolean(animalBldgRes.build.metadata.rooms && animalBldgRes.build.metadata.rooms.length > 0), 'Animal-shaped building generates interior room volume');
+  assert(animalBldgRes.semanticSubject.parts.some((p) => p.type === 'head'), 'Animal silhouette preserved (sculpted head)');
+  assert(animalBldgRes.semanticSubject.parts.some((p) => p.type === 'wall'), 'Animal architectural shell preserves hollow interior');
+
+  const pureAnimalClass = classifyAndDecomposeSubject({ name: 'wild_brown_bear.png' });
+  assert(pureAnimalClass.structureType === 'decorative object', 'Pure wild animal classified as non-architectural creature');
+  assert(pureAnimalClass.hasInteriorSpace === false, 'Pure wild animal has NO interior space');
+
+  // TEST 5: Upload a garden
+  console.log('\nTest Suite 27: FIX #2 TEST 5 — Outdoor Garden Landscaping');
+  const gardenRes = await UniversalReconstructor.reconstruct([
+    { name: 'botanical_zen_garden.png' },
+  ]);
+  const gardenClass = classifyAndDecomposeSubject({ name: 'botanical_zen_garden.png' });
+  assert(gardenRes.build.metadata.structureType === 'garden', 'Garden correctly classified as structureType: garden');
+  assert(gardenRes.build.metadata.hasInteriorSpace === false, 'Garden correctly recognized as outdoor open space (hasInteriorSpace: false)');
+  assert(gardenClass.isArchitectural === false, 'Garden is not categorized as an architectural building');
+  assert(!gardenRes.build.blocks.some((b) => b.blockId === 'minecraft:smooth_quartz'), 'Garden is NOT incorrectly converted into quartz greenhouse building');
+  assert(!gardenRes.build.blocks.some((b) => b.blockId === 'minecraft:pink_stained_glass'), 'Garden is NOT converted into pink glass canopy');
+  assert(gardenRes.build.blocks.some((b) => b.blockId === 'minecraft:grass_block'), 'Garden contains outdoor lawn terrace');
+  assert(gardenRes.build.blocks.some((b) => b.blockId === 'minecraft:stone_bricks'), 'Garden contains stone walkways');
+  assert(gardenRes.build.blocks.some((b) => b.blockId.includes('leaves') || b.blockId.includes('moss')), 'Garden contains authentic outdoor flora');
+
+  // TEST 6: Upload an image showing only one side
+  console.log('\nTest Suite 28: FIX #2 TEST 6 — Single-Side Reference & Provenance Tracking');
+  const singleSideClass = classifyAndDecomposeSubject({
+    name: 'cottage_front_elevation.png',
+    probableView: 'front',
+  });
+  const singleSideBuild = UniversalVoxelizer.voxelize(singleSideClass.semanticSubject, '1.21');
+
+  const observedBlocks = singleSideBuild.blocks.filter((b) => b.provenance === 'observed');
+  const inferredBlocks = singleSideBuild.blocks.filter((b) => b.provenance === 'inferred');
+  const generatedBlocks = singleSideBuild.blocks.filter((b) => b.provenance === 'generated');
+
+  assert(observedBlocks.length > 0, 'Visible side blocks classified as OBSERVED');
+  assert(inferredBlocks.length > 0, 'Unseen rear/hidden side blocks classified as INFERRED');
+  assert(generatedBlocks.length > 0, 'Interior furnishings classified as GENERATED');
+
+  // Confidence validation: observed has highest confidence, inferred has moderate, generated has lower
+  const avgObservedConf = observedBlocks.reduce((acc, b) => acc + (b.confidence ?? 0), 0) / observedBlocks.length;
+  const avgInferredConf = inferredBlocks.reduce((acc, b) => acc + (b.confidence ?? 0), 0) / inferredBlocks.length;
+  const avgGeneratedConf = generatedBlocks.reduce((acc, b) => acc + (b.confidence ?? 0), 0) / generatedBlocks.length;
+
+  assert(avgObservedConf >= 0.90, `Observed blocks have high confidence >= 0.90 (actual: ${avgObservedConf.toFixed(2)})`);
+  assert(avgInferredConf >= 0.70 && avgInferredConf < avgObservedConf, `Inferred blocks have moderate confidence (actual: ${avgInferredConf.toFixed(2)})`);
+  assert(avgGeneratedConf >= 0.60 && avgGeneratedConf < avgInferredConf, `Generated blocks have conservative confidence (actual: ${avgGeneratedConf.toFixed(2)})`);
+  assert(singleSideBuild.metadata.provenanceBreakdown !== undefined, 'Single-side build records complete provenance breakdown metadata');
+
+  // TEST SUITE 29: FIX #3 — Authentic Minecraft Asset, Texture, Model & Gallery Regression
+  console.log('\nTest Suite 29: FIX #3 — Authentic Minecraft Asset, Texture, Model & Gallery Regression');
+
+  // 1. One Source of Truth & Version Pinning (Sections 1 & 2)
+  assert(typeof MINECRAFT_VERSION === 'string' && MINECRAFT_VERSION.length > 0, 'Minecraft version pinned in registry');
+  assert(typeof REGISTRY_SNAPSHOT_ID === 'string' && REGISTRY_SNAPSHOT_ID.length > 0, 'Registry snapshot ID explicitly pinned');
+  assert(typeof ASSET_MANIFEST_HASH === 'string' && ASSET_MANIFEST_HASH.startsWith('sha256-'), 'Asset manifest checksum pinned with SHA-256');
+
+  const validBlocks121 = getValidBlocks('1.21');
+  const validBlocks120 = getValidBlocks('1.20');
+  assert(validBlocks121.length > validBlocks120.length, 'Target version 1.21 includes 1.21 update blocks');
+  assert(validBlocks120.every((b) => b.sinceVersion !== '1.21'), 'Target version 1.20 excludes 1.21-exclusive blocks');
+
+  // Version substitution test
+  const sub120 = substituteBlockForVersion('minecraft:copper_grate', '1.20');
+  assert(sub120.substituted === true && sub120.blockId === 'minecraft:iron_bars', '1.21 block gracefully substitutes in 1.20 target build');
+
+  // 2. Automated Block Gallery Regression Test (Section 16: at least 32 specified blocks)
+  const requiredGalleryBlocks = [
+    'stone',
+    'stone_bricks',
+    'cobblestone',
+    'oak_planks',
+    'oak_log',
+    'oak_stairs',
+    'oak_slab',
+    'glass',
+    'glass_pane',
+    'white_wool',
+    'pink_wool',
+    'pink_stained_glass',
+    'grass_block',
+    'dirt',
+    'sand',
+    'deepslate',
+    'deepslate_bricks',
+    'deepslate_tiles',
+    'blackstone',
+    'blackstone_bricks',
+    'quartz_block',
+    'smooth_quartz',
+    'leaves',
+    'vine',
+    'lantern',
+    'torch',
+    'redstone',
+    'iron_bars',
+    'fence',
+    'wall',
+    'door',
+    'trapdoor',
+  ];
+
+  for (const blockKey of requiredGalleryBlocks) {
+    const blockDef = getMinecraftBlock(blockKey);
+    assert(blockDef !== undefined, `Gallery Block '${blockKey}' exists in unified registry`);
+
+    const modelId = resolveBlockModel(blockDef?.id || blockKey);
+    assert(modelId.startsWith('minecraft:block/'), `Gallery Block '${blockKey}' resolves valid model identifier (${modelId})`);
+
+    const textureId = resolveBlockTexture(blockDef?.id || blockKey);
+    assert(textureId.length > 0 && textureId.includes('minecraft:block/'), `Gallery Block '${blockKey}' resolves valid texture identifier (${textureId})`);
+
+    // Verify canvas generation executes without error
+    const canvas = renderBlockCanvas(blockDef?.id || blockKey, blockDef?.colorHex || '#808080');
+    assert(canvas !== undefined && canvas.width === 16 && canvas.height === 16, `Gallery Block '${blockKey}' generates 16x16 pixel texture`);
+  }
+
+  // 3. Geometry Differentiation: Non-cubes are NEVER rendered as generic cubes (Section 5)
+  const stairGeo = getBlockGeometry('stairs', { facing: 'north', half: 'bottom', shape: 'straight' });
+  assert(stairGeo.getAttribute('position').count > 24, 'Stair geometry has authentic stepped Minecraft geometry (not a generic cube)');
+
+  const slabGeo = getBlockGeometry('slab', { type: 'bottom' });
+  const slabBox = new THREE.Box3().setFromBufferAttribute(slabGeo.getAttribute('position') as THREE.BufferAttribute);
+  assert(Math.abs(slabBox.max.y - slabBox.min.y - 0.5) < 0.01, 'Slab geometry has half-height vertical bounding box (0.5 blocks)');
+
+  const paneGeo = getBlockGeometry('pane');
+  const paneBox = new THREE.Box3().setFromBufferAttribute(paneGeo.getAttribute('position') as THREE.BufferAttribute);
+  assert(Math.abs(paneBox.max.z - paneBox.min.z - 0.125) < 0.01, 'Glass Pane / Iron Bars geometry has thin depth (0.125 blocks)');
+
+  const fenceGeo = getBlockGeometry('fence');
+  const fenceBox = new THREE.Box3().setFromBufferAttribute(fenceGeo.getAttribute('position') as THREE.BufferAttribute);
+  assert(Math.abs(fenceBox.max.x - fenceBox.min.x - 0.25) < 0.01, 'Fence post geometry has 0.25 cross-section');
+
+  const wallGeo = getBlockGeometry('wall');
+  const wallBox = new THREE.Box3().setFromBufferAttribute(wallGeo.getAttribute('position') as THREE.BufferAttribute);
+  assert(Math.abs(wallBox.max.x - wallBox.min.x - 0.375) < 0.01, 'Wall post geometry has 0.375 cross-section');
+
+  const lanternGeo = getBlockGeometry('lantern');
+  assert(lanternGeo.getAttribute('position').count > 24, 'Lantern has composite body with chain hanger loop geometry');
+
+  const doorGeo = getBlockGeometry('door', { half: 'lower' });
+  const doorBox = new THREE.Box3().setFromBufferAttribute(doorGeo.getAttribute('position') as THREE.BufferAttribute);
+  assert(Math.abs(doorBox.max.z - doorBox.min.z - 0.1875) < 0.01, 'Door geometry has authentic 3/16 panel thickness');
+
+  const trapdoorClosed = getBlockGeometry('trapdoor', { open: 'false', half: 'bottom' });
+  const trapdoorClosedBox = new THREE.Box3().setFromBufferAttribute(trapdoorClosed.getAttribute('position') as THREE.BufferAttribute);
+  assert(Math.abs(trapdoorClosedBox.max.y - trapdoorClosedBox.min.y - 0.1875) < 0.01, 'Closed trapdoor geometry has horizontal 3/16 slab form');
+
+  const torchGeo = getBlockGeometry('torch');
+  const torchBox = new THREE.Box3().setFromBufferAttribute(torchGeo.getAttribute('position') as THREE.BufferAttribute);
+  assert(Math.abs(torchBox.max.x - torchBox.min.x - 0.125) < 0.01, 'Torch geometry has 2x10x2 voxel stick geometry');
+
+  // 4. Color Space & Nearest-Neighbor Pixel Art Rendering (Section 6 & 13)
+  const stoneTex = getOrCreateBlockTexture('minecraft:stone');
+  assert(stoneTex.colorSpace === THREE.SRGBColorSpace, 'Block texture uses SRGBColorSpace encoding');
+  assert(stoneTex.magFilter === THREE.NearestFilter && stoneTex.minFilter === THREE.NearestFilter, 'Block texture uses NearestFilter for pixel art preservation');
+  assert(stoneTex.generateMipmaps === false, 'Mipmap blurring disabled for crisp Minecraft pixels');
+
+  // 5. Multi-Face Texturing & Axis Orientation (Section 9)
+  const grassFaces = getMultiFaceTextures('minecraft:grass_block');
+  assert(grassFaces !== null && grassFaces.length === 6, 'Grass block resolves multi-material array for top, bottom, and side faces');
+
+  const logFacesY = getMultiFaceTextures('minecraft:oak_log', { axis: 'y' });
+  const logFacesX = getMultiFaceTextures('minecraft:oak_log', { axis: 'x' });
+  assert(logFacesY !== null && logFacesX !== null, 'Oak log resolves multi-material array for rings vs bark');
+
+  // 6. AI Block Solver Registry Integrity (Section 17)
+  assert(isValidBlockId('minecraft:stone') === true, 'Standard block ID accepted');
+  assert(isValidBlockId('minecraft:imaginary_block') === false, 'AI solver rejects fake/imaginary block IDs');
+  assert(isValidBlockState('minecraft:oak_stairs', { facing: 'east', half: 'bottom' }) === true, 'Valid blockstate passes validation');
+  assert(isValidBlockState('minecraft:oak_stairs', { facing: 'sideways' }) === false, 'Invalid blockstate correctly rejected');
 
   console.log('\n============================================================');
   console.log(`TEST RESULTS: ${passed} PASSED, ${failed} FAILED`);

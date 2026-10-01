@@ -4,6 +4,7 @@ import { BlockPlacement, MinecraftBuild } from '../../types/minecraft.ts';
 import { getMinecraftBlock } from '../../lib/registry.ts';
 import { getBlockGeometry } from '../../lib/models/blockModelRegistry.ts';
 import { getOrCreateBlockTexture } from '../../lib/textureGenerator.ts';
+import { createSharedBlockMaterial } from '../../lib/rendering/blockPreviewRenderer.ts';
 import { OrientationGizmo, GizmoViewTarget } from './OrientationGizmo.tsx';
 import {
   Focus,
@@ -367,27 +368,29 @@ export const ThreeViewport: React.FC<ThreeViewportProps> = ({
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Three-point lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
+    // Authentic Minecraft lighting: Balanced ambient and directional lighting without plastic glare
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     ambientLight.name = 'ambientLight';
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xfff5e6, 1.4);
-    dirLight.position.set(45, 70, 45);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
+    dirLight.position.set(35, 60, 25);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 1024;
     dirLight.shadow.mapSize.height = 1024;
     dirLight.name = 'dirLight';
     scene.add(dirLight);
 
-    const rimLight = new THREE.DirectionalLight(0x7090b0, 0.65);
-    rimLight.position.set(-45, 35, -45);
+    const rimLight = new THREE.DirectionalLight(0x8ba2b8, 0.35);
+    rimLight.position.set(-35, 30, -35);
     rimLight.name = 'rimLight';
     scene.add(rimLight);
 
@@ -575,7 +578,7 @@ export const ThreeViewport: React.FC<ThreeViewportProps> = ({
       const geo = getBlockGeometry(shapeType, group.state);
 
       // Material according to ShadingMode
-      let mat: THREE.Material;
+      let mat: THREE.Material | THREE.Material[];
       if (shadingMode === 'solid') {
         mat = new THREE.MeshStandardMaterial({
           color: new THREE.Color('#c8ccd4'),
@@ -597,25 +600,7 @@ export const ThreeViewport: React.FC<ThreeViewportProps> = ({
           depthWrite: true,
         });
       } else {
-        const texture = getOrCreateBlockTexture(group.blockId, def?.colorHex);
-        const cleanId = group.blockId.replace('minecraft:', '').toLowerCase();
-        const isGlass = cleanId.includes('glass');
-        const isLeaves = cleanId.includes('leaves') || cleanId.includes('vine');
-        const isPlant = shapeType === 'plant' || shapeType === 'torch';
-        const isDoor = cleanId.includes('door') || cleanId.includes('grate');
-        const isTransparent = isGlass || isLeaves || isPlant || isDoor || !!def?.transparent;
-
-        mat = new THREE.MeshStandardMaterial({
-          map: texture,
-          color: new THREE.Color(isPlant || isLeaves || isGlass ? '#ffffff' : (def?.colorHex || '#ffffff')),
-          roughness: isGlass ? 0.05 : (def?.roughness ?? 0.8),
-          metalness: isGlass ? 0.1 : (def?.metalness ?? 0.05),
-          transparent: isTransparent,
-          opacity: isGlass ? (cleanId.includes('tinted') ? 0.75 : 0.55) : 1.0,
-          alphaTest: (isPlant || isLeaves || isDoor) ? 0.25 : 0,
-          side: isPlant ? THREE.DoubleSide : THREE.FrontSide,
-          depthWrite: !isGlass,
-        });
+        mat = createSharedBlockMaterial(group.blockId, group.state);
       }
 
       const instancedMesh = new THREE.InstancedMesh(geo, mat, group.blocks.length);

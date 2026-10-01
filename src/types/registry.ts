@@ -106,6 +106,8 @@ export interface NormalizedBlockDefinition {
 export interface ProjectPinningInfo {
   minecraftVersion: string;
   registrySnapshot: string; // SHA-256 hash
+  registrySnapshotId?: string;
+  assetManifestHash?: string;
   registrySchemaVersion: string;
 }
 

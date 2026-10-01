@@ -4,7 +4,11 @@ import {
   MinecraftBuild,
   BlockPlacement,
   ProvenanceType,
+  ProvenanceBreakdown,
+  CameraPerspectiveInfo,
 } from '../../types/minecraft';
+import { CameraPerspectiveAnalyzer } from '../vision/cameraPerspectiveAnalyzer';
+import { InteriorGenerator } from '../interior/interiorGenerator';
 
 export class UniversalVoxelizer {
   private static blockCounter = 0;
@@ -12,6 +16,12 @@ export class UniversalVoxelizer {
   /**
    * Converts a UniversalSemanticSubject continuous 3D representation into
    * a discrete, authentic Minecraft block build.
+   *
+   * Enforces FIX #2:
+   * 1. Separates provenance into OBSERVED, INFERRED, and GENERATED with calibrated confidence.
+   * 2. Detects empty volume and generates real enclosed space instead of flat facades or hollow shells.
+   * 3. Guarantees walkable corridors and enterable doorways for inhabitable structures.
+   * 4. Tracks provenance breakdown and room specifications in build metadata.
    */
   public static voxelize(
     subject: UniversalSemanticSubject,
@@ -19,6 +29,10 @@ export class UniversalVoxelizer {
   ): MinecraftBuild {
     this.blockCounter = 0;
     const blockMap = new Map<string, BlockPlacement>();
+    const hasInterior = subject.hasInteriorSpace === true;
+    const perspective: CameraPerspectiveInfo =
+      subject.cameraPerspective ||
+      CameraPerspectiveAnalyzer.analyzePerspective({ name: subject.subjectName });
 
     const put = (
       blockId: string,
@@ -26,7 +40,8 @@ export class UniversalVoxelizer {
       y: number,
       z: number,
       state?: Record<string, string>,
-      provenance: ProvenanceType = 'observed'
+      provenance: ProvenanceType = 'observed',
+      confidence?: number
     ) => {
       const key = `${x},${y},${z}`;
       this.blockCounter++;
@@ -36,12 +51,13 @@ export class UniversalVoxelizer {
         position: { x, y, z },
         state,
         provenance,
+        confidence,
       });
     };
 
     // 1. Voxelize each semantic part
     for (const part of subject.parts) {
-      this.voxelizePart(part, put);
+      this.voxelizePart(part, put, hasInterior);
     }
 
     // 2. Voxelize ground / environmental terrain if specified
@@ -49,9 +65,7 @@ export class UniversalVoxelizer {
       this.voxelizeEnvironment(subject.groundOrEnvironment, subject.dimensions, put);
     }
 
-    const blocks = Array.from(blockMap.values());
-
-    // Calculate actual bounding box
+    // 3. Compute initial exterior bounding box
     let minX = Infinity,
       maxX = -Infinity,
       minY = Infinity,
@@ -59,7 +73,7 @@ export class UniversalVoxelizer {
       minZ = Infinity,
       maxZ = -Infinity;
 
-    for (const b of blocks) {
+    for (const b of blockMap.values()) {
       if (b.position.x < minX) minX = b.position.x;
       if (b.position.x > maxX) maxX = b.position.x;
       if (b.position.y < minY) minY = b.position.y;
@@ -67,6 +81,82 @@ export class UniversalVoxelizer {
       if (b.position.z < minZ) minZ = b.position.z;
       if (b.position.z > maxZ) maxZ = b.position.z;
     }
+
+    const wallHeight = Math.max(4, Math.round((maxY - minY + 1) * 0.45));
+
+    // 4. Generate interior spaces, rooms, and furnishings for structures with interior space
+    let generatedRooms = subject.rooms || [];
+    if (hasInterior && maxX - minX >= 4 && maxZ - minZ >= 4) {
+      // Find candidate wall wood material from parts
+      const wallPart = subject.parts.find((p) => p.type === 'wall' || p.type === 'body');
+      const primaryWood = wallPart?.materialCandidate || 'minecraft:oak_planks';
+
+      const interiorResult = InteriorGenerator.generateInterior({
+        structureType: subject.structureType || 'house',
+        exteriorBounds: { minX, maxX, minY, maxY, minZ, maxZ },
+        wallHeight,
+        isArchitectural: subject.category === 'architecture',
+        paletteTheme: {
+          primaryWood,
+          lightSource: 'minecraft:lantern',
+        },
+      });
+
+      if (interiorResult.hasInterior) {
+        generatedRooms = interiorResult.rooms;
+        for (const ib of interiorResult.blocks) {
+          put(
+            ib.blockId,
+            ib.position.x,
+            ib.position.y,
+            ib.position.z,
+            ib.state,
+            'generated',
+            ib.confidence ?? 0.65
+          );
+        }
+      }
+    }
+
+    // 5. Evaluate block provenance using Camera Perspective Analysis
+    // Observed: directly visible facets facing the camera (high confidence >= 0.90)
+    // Inferred: reasonably continued hidden sides, rear walls, symmetrical ribs (confidence 0.70-0.74)
+    // Generated: interior layout, rooms, and furniture (confidence 0.60-0.70)
+    const bounds = { minX, maxX, minY, maxY, minZ, maxZ };
+    for (const b of blockMap.values()) {
+      if (b.provenance !== 'generated') {
+        const provInfo = CameraPerspectiveAnalyzer.evaluateBlockProvenance(
+          b.position.x,
+          b.position.y,
+          b.position.z,
+          bounds,
+          perspective,
+          false
+        );
+        b.provenance = provInfo.provenance;
+        b.confidence = provInfo.confidence;
+      }
+    }
+
+    const blocks = Array.from(blockMap.values());
+
+    // 6. Compute exact Provenance Breakdown
+    const total = blocks.length || 1;
+    const observedCount = blocks.filter((b) => b.provenance === 'observed').length;
+    const inferredCount = blocks.filter((b) => b.provenance === 'inferred').length;
+    const generatedCount = blocks.filter((b) => b.provenance === 'generated').length;
+
+    const provenanceBreakdown: ProvenanceBreakdown = {
+      observedCount,
+      inferredCount,
+      generatedCount,
+      observedPercent: parseFloat(((observedCount / total) * 100).toFixed(1)),
+      inferredPercent: parseFloat(((inferredCount / total) * 100).toFixed(1)),
+      generatedPercent: parseFloat(((generatedCount / total) * 100).toFixed(1)),
+      observedRatio: parseFloat((observedCount / total).toFixed(3)),
+      inferredRatio: parseFloat((inferredCount / total).toFixed(3)),
+      generatedRatio: parseFloat((generatedCount / total).toFixed(3)),
+    };
 
     const width = maxX >= minX ? maxX - minX + 1 : subject.dimensions.width;
     const height = maxY >= minY ? maxY - minY + 1 : subject.dimensions.height;
@@ -80,6 +170,11 @@ export class UniversalVoxelizer {
       blocks,
       metadata: {
         style: subject.category,
+        structureType: subject.structureType || 'unknown',
+        hasInteriorSpace: subject.hasInteriorSpace ?? false,
+        cameraPerspective: perspective,
+        rooms: generatedRooms,
+        provenanceBreakdown,
         scale: 1.0,
         confidence: {
           overall: subject.confidence,
@@ -102,7 +197,16 @@ export class UniversalVoxelizer {
 
   private static voxelizePart(
     part: SemanticPart,
-    put: (blockId: string, x: number, y: number, z: number, state?: Record<string, string>, prov?: ProvenanceType) => void
+    put: (
+      blockId: string,
+      x: number,
+      y: number,
+      z: number,
+      state?: Record<string, string>,
+      prov?: ProvenanceType,
+      conf?: number
+    ) => void,
+    hasInterior: boolean = false
   ) {
     const rx = Math.max(1, Math.floor(part.dimensions.x / 2));
     const ry = Math.max(1, Math.floor(part.dimensions.y / 2));
@@ -120,7 +224,6 @@ export class UniversalVoxelizer {
         for (let dx = -rx; dx <= rx; dx++) {
           for (let dy = -ry; dy <= ry; dy++) {
             for (let dz = -rz; dz <= rz; dz++) {
-              // Taper toward rear/front if tapered_hull
               const taperFactor = part.shape === 'tapered_hull' ? 1.0 - (dz / rz) * 0.15 : 1.0;
               const normalizedDist =
                 Math.pow(dx / (rx * taperFactor), 2) +
@@ -134,7 +237,7 @@ export class UniversalVoxelizer {
           }
         }
       } else if (part.shape === 'cylinder') {
-        // Vertical or oriented cylinder (e.g. horns, trunk)
+        // Vertical or oriented cylinder (horns, trunk, pillars)
         for (let dy = -ry; dy <= ry; dy++) {
           const curveOffsetX = Math.round(Math.sin((dy / ry) * 0.6) * 1.5);
           for (let dx = -rx; dx <= rx; dx++) {
@@ -158,19 +261,68 @@ export class UniversalVoxelizer {
           }
         }
       } else if (part.shape === 'curved_strip') {
-        // Surface marking (e.g. arrow marking down spine)
+        // Surface marking (arrow crest)
         for (let dz = -rz; dz <= rz; dz++) {
-          // Arrow width tapers toward head
           const stripWidth = Math.max(1, Math.round(rx * (1.0 - (dz / rz) * 0.4)));
           for (let dx = -stripWidth; dx <= stripWidth; dx++) {
             put(blockId, centerX + dx, cy, cz + dz);
           }
         }
+      } else if (part.shape === 'wedge') {
+        // Tapered triangular wedge (pitched roof / ramp)
+        for (let dy = -ry; dy <= ry; dy++) {
+          const slopeProgress = (dy + ry) / (2 * ry || 1);
+          const allowedX = Math.max(0, Math.round(rx * (1.0 - slopeProgress)));
+          for (let dx = -allowedX; dx <= allowedX; dx++) {
+            for (let dz = -rz; dz <= rz; dz++) {
+              put(blockId, centerX + dx, cy + dy, cz + dz);
+            }
+          }
+        }
       } else {
         // Box / Block volume
+        const isPerimeterWall =
+          hasInterior &&
+          part.type === 'wall' &&
+          (part.shape === 'box' || part.shape === 'quad_wall') &&
+          rx >= 3 &&
+          rz >= 3;
+
         for (let dx = -rx; dx <= rx; dx++) {
           for (let dy = -ry; dy <= ry; dy++) {
             for (let dz = -rz; dz <= rz; dz++) {
+              if (isPerimeterWall) {
+                // Wall thickness: 1 block, leaving interior cavity hollow for rooms
+                const isPerimeter = Math.abs(dx) >= rx - 1 || Math.abs(dz) >= rz - 1;
+                if (!isPerimeter) continue;
+
+                // Enterable front entrance doorway (at x = 0, dz = rz)
+                if (dz === rz && Math.abs(dx) <= 0 && dy <= -ry + 2) {
+                  if (dy === -ry + 1) {
+                    put('minecraft:oak_door', centerX + dx, cy + dy, cz + dz, {
+                      half: 'lower',
+                      facing: 'south',
+                      hinge: 'left',
+                      open: 'false',
+                    });
+                  } else if (dy === -ry + 2) {
+                    put('minecraft:oak_door', centerX + dx, cy + dy, cz + dz, {
+                      half: 'upper',
+                      facing: 'south',
+                      hinge: 'left',
+                      open: 'false',
+                    });
+                  }
+                  continue;
+                }
+
+                // Front window fenestrations at eye level
+                if (dz === rz && Math.abs(dx) === Math.round(rx * 0.5) && dy === -ry + 2) {
+                  put('minecraft:glass_pane', centerX + dx, cy + dy, cz + dz);
+                  continue;
+                }
+              }
+
               put(blockId, centerX + dx, cy + dy, cz + dz);
             }
           }
@@ -187,7 +339,15 @@ export class UniversalVoxelizer {
   private static voxelizeEnvironment(
     env: NonNullable<UniversalSemanticSubject['groundOrEnvironment']>,
     dimensions: { width: number; height: number; depth: number },
-    put: (blockId: string, x: number, y: number, z: number, state?: Record<string, string>, prov?: ProvenanceType) => void
+    put: (
+      blockId: string,
+      x: number,
+      y: number,
+      z: number,
+      state?: Record<string, string>,
+      prov?: ProvenanceType,
+      conf?: number
+    ) => void
   ) {
     if (env.terrainType === 'cherry_grove') {
       const halfW = Math.floor(dimensions.width * 0.9);
@@ -197,8 +357,8 @@ export class UniversalVoxelizer {
       // 1. Lower grass terrace floor
       for (let x = -halfW; x <= halfW; x++) {
         for (let z = -halfD; z <= halfD; z++) {
-          put('minecraft:grass_block', x, groundY, z, undefined, 'inferred');
-          put('minecraft:dirt', x, groundY - 1, z, undefined, 'inferred');
+          put('minecraft:grass_block', x, groundY, z, undefined, 'inferred', 0.85);
+          put('minecraft:dirt', x, groundY - 1, z, undefined, 'inferred', 0.82);
         }
       }
 
@@ -214,14 +374,14 @@ export class UniversalVoxelizer {
       for (const tc of treeCenters) {
         // Cherry trunk
         for (let ty = groundY + 1; ty <= groundY + 4; ty++) {
-          put('minecraft:cherry_log', tc.x, ty, tc.z, undefined, 'inferred');
+          put('minecraft:cherry_log', tc.x, ty, tc.z, undefined, 'inferred', 0.8);
         }
         // Cherry foliage canopy blob
         for (let fx = -2; fx <= 2; fx++) {
           for (let fz = -2; fz <= 2; fz++) {
             for (let fy = 4; fy <= 6; fy++) {
               if (Math.abs(fx) + Math.abs(fz) + Math.abs(fy - 5) <= 4) {
-                put('minecraft:cherry_leaves', tc.x + fx, groundY + fy, tc.z + fz, undefined, 'inferred');
+                put('minecraft:cherry_leaves', tc.x + fx, groundY + fy, tc.z + fz, undefined, 'inferred', 0.78);
               }
             }
           }

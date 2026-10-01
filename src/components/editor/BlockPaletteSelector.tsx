@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Boxes, Sparkles, Filter } from 'lucide-react';
 import { MINECRAFT_BLOCKS } from '../../lib/registry.ts';
 import { BlockCategory } from '../../types/minecraft.ts';
-import { getBlockIconDataUrl } from '../../lib/textureGenerator.ts';
+import { getBlockPreviewThumbnail } from '../../lib/rendering/blockPreviewRenderer.ts';
 
 interface BlockPaletteSelectorProps {
   selectedBlockId: string;
@@ -55,7 +55,7 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded border border-white/20 shadow-inner shrink-0 bg-slate-900 overflow-hidden flex items-center justify-center">
               <img
-                src={getBlockIconDataUrl(activeBlock.id)}
+                src={getBlockPreviewThumbnail(activeBlock.id, activeBlock.defaultState)}
                 alt={activeBlock.name}
                 className="w-8 h-8 object-contain"
                 style={{ imageRendering: 'pixelated' }}
@@ -126,7 +126,7 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
             >
               <div className="w-9 h-9 rounded-md bg-slate-900/90 border border-slate-700/60 shadow-inner mb-1 flex items-center justify-center overflow-hidden p-0.5 group-hover:scale-105 transition-transform">
                 <img
-                  src={getBlockIconDataUrl(block.id)}
+                  src={getBlockPreviewThumbnail(block.id, block.defaultState)}
                   alt={block.name}
                   className="w-8 h-8 object-contain"
                   style={{ imageRendering: 'pixelated' }}

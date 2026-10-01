@@ -74,6 +74,7 @@ export interface BlockPlacement {
   };
   state?: Record<string, string>; // e.g. { facing: "north", half: "bottom", shape: "straight" }
   provenance?: ProvenanceType; // 'observed' | 'inferred' | 'generated'
+  confidence?: number; // 0.0 to 1.0 specific placement confidence
   customData?: Record<string, any>;
 }
 
@@ -113,6 +114,8 @@ export interface MinecraftBuild {
     iterationHistory?: IterationStepReport[];
     minecraftVersion?: string;
     registrySnapshot?: string;
+    registrySnapshotId?: string;
+    assetManifestHash?: string;
     registrySchemaVersion?: string;
     subjectCategory?: SubjectCategory;
     semanticSubject?: UniversalSemanticSubject;
@@ -122,7 +125,95 @@ export interface MinecraftBuild {
       inferredPercent: number;
       generatedPercent: number;
     };
+    structureType?: StructureType;
+    hasInteriorSpace?: boolean | 'uncertain';
+    rooms?: RoomSpecification[];
+    cameraPerspective?: CameraPerspectiveInfo;
+    provenanceBreakdown?: ProvenanceBreakdown;
   };
+}
+
+export type StructureType =
+  | 'house'
+  | 'cabin'
+  | 'mansion'
+  | 'farm'
+  | 'barn'
+  | 'greenhouse'
+  | 'garden'
+  | 'shop'
+  | 'workshop'
+  | 'factory'
+  | 'tower'
+  | 'castle'
+  | 'temple'
+  | 'monument'
+  | 'statue'
+  | 'vehicle'
+  | 'ship'
+  | 'aircraft'
+  | 'machine'
+  | 'animal-shaped structure'
+  | 'plant-shaped structure'
+  | 'landscape structure'
+  | 'bridge'
+  | 'decorative object'
+  | 'unknown';
+
+export type RoomType =
+  | 'entrance'
+  | 'living_room'
+  | 'kitchen'
+  | 'bedroom'
+  | 'bathroom'
+  | 'storage'
+  | 'staircase'
+  | 'farm_storage'
+  | 'animal_stable'
+  | 'loft'
+  | 'planting_bay'
+  | 'workshop_forge'
+  | 'customer_area'
+  | 'altar_chamber'
+  | 'great_hall'
+  | 'cockpit'
+  | 'corridor';
+
+export interface RoomSpecification {
+  id: string;
+  name: string;
+  type: RoomType;
+  bounds: {
+    xMin: number;
+    xMax: number;
+    yMin: number;
+    yMax: number;
+    zMin: number;
+    zMax: number;
+  };
+  provenance: ProvenanceType;
+  confidence: number;
+  features: string[];
+}
+
+export interface CameraPerspectiveInfo {
+  viewDirection: 'front' | 'three_quarter_front_left' | 'three_quarter_front_right' | 'isometric' | 'aerial' | 'rear' | 'side';
+  elevation: 'ground' | 'three_quarter_elevated' | 'aerial';
+  observedFacets: string[]; // e.g. ['front', 'left', 'roof']
+  inferredFacets: string[]; // e.g. ['back', 'right']
+  confidence: number;
+}
+
+export interface ProvenanceBreakdown {
+  observedCount: number;
+  inferredCount: number;
+  generatedCount: number;
+  observedRatio?: number;
+  inferredRatio?: number;
+  generatedRatio?: number;
+  observedPercent?: number;
+  inferredPercent?: number;
+  generatedPercent?: number;
 }
 
 export type SubjectCategory =
@@ -138,6 +229,7 @@ export type SubjectCategory =
   | 'object'
   | 'monument'
   | 'terrain_object'
+  | 'landscape'
   | 'unknown';
 
 export interface SemanticPart {
@@ -174,25 +266,29 @@ export interface SemanticPart {
   isDetail?: boolean;
 }
 
+export interface PrimaryMass {
+  shape: 'rounded_box' | 'ellipsoid' | 'tapered_capsule' | 'hull' | 'quad_wall';
+  dimensions: { x: number; y: number; z: number };
+  position: { x: number; y: number; z: number };
+  materialCandidate: string;
+  colorHex: string;
+}
+
+export interface GroundOrEnvironment {
+  hasTerrain: boolean;
+  terrainType?: 'cherry_grove' | 'grass_plains' | 'road' | 'water';
+  canopyBlocks?: string[];
+  groundY?: number;
+}
+
 export interface UniversalSemanticSubject {
   category: SubjectCategory;
   subjectName: string;
   confidence: number;
   dimensions: BuildDimensions;
-  primaryMass: {
-    shape: 'rounded_box' | 'ellipsoid' | 'tapered_capsule' | 'hull' | 'quad_wall';
-    dimensions: { x: number; y: number; z: number };
-    position: { x: number; y: number; z: number };
-    materialCandidate: string;
-    colorHex: string;
-  };
+  primaryMass: PrimaryMass;
   parts: SemanticPart[];
-  groundOrEnvironment?: {
-    hasTerrain: boolean;
-    terrainType?: 'cherry_grove' | 'grass_plains' | 'road' | 'water';
-    canopyBlocks?: string[];
-    groundY?: number;
-  };
+  groundOrEnvironment?: GroundOrEnvironment;
   silhouetteBounds: {
     xMin: number;
     xMax: number;
@@ -201,6 +297,10 @@ export interface UniversalSemanticSubject {
     zMin: number;
     zMax: number;
   };
+  structureType?: StructureType;
+  hasInteriorSpace?: boolean | 'uncertain';
+  cameraPerspective?: CameraPerspectiveInfo;
+  rooms?: RoomSpecification[];
 }
 
 export interface FidelityReport {
