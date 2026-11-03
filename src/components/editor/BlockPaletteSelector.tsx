@@ -48,12 +48,12 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
   const activeBlock = MINECRAFT_BLOCKS.find((b) => b.id === selectedBlockId);
 
   return (
-    <div className="flex flex-col h-full text-slate-200 select-none">
+    <div className="flex flex-col h-full text-zinc-200 select-none">
       {/* Active Selected Block Spotlight */}
       {activeBlock && (
-        <div className="p-3 border-b border-slate-800 bg-slate-950/40">
+        <div className="p-3 border-b border-zinc-800 bg-zinc-950/60">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded border border-white/20 shadow-inner shrink-0 bg-slate-900 overflow-hidden flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl border border-white/10 shadow-inner shrink-0 bg-zinc-900 overflow-hidden flex items-center justify-center">
               <img
                 src={getBlockPreviewThumbnail(activeBlock.id, activeBlock.defaultState)}
                 alt={activeBlock.name}
@@ -62,15 +62,15 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
               />
             </div>
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs font-bold text-slate-100 truncate">
+              <span className="text-xs font-bold text-zinc-100 truncate">
                 {activeBlock.name}
               </span>
-              <span className="text-[10px] font-mono text-emerald-400 truncate">
+              <span className="text-[10px] font-mono text-green-400 truncate">
                 {activeBlock.id}
               </span>
             </div>
             {activeBlock.sinceVersion && (
-              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-slate-800 text-slate-400">
+              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-zinc-800 text-zinc-400">
                 {activeBlock.sinceVersion}
               </span>
             )}
@@ -81,13 +81,13 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
       {/* Search Bar */}
       <div className="p-3 pb-2">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search Minecraft blocks..."
-            className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-950/70 border border-slate-800 rounded-lg text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50"
+            className="w-full px-3 py-2 pl-8 text-sm bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/15"
           />
         </div>
 
@@ -97,10 +97,10 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-2 py-0.5 text-[10px] font-medium rounded-md whitespace-nowrap transition-colors ${
+              className={`px-2 py-0.5 text-[10px] font-medium rounded-lg whitespace-nowrap transition-colors border ${
                 activeCategory === cat.id
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold'
-                  : 'text-slate-400 hover:text-slate-200 bg-slate-950/40 border border-slate-800/80'
+                  ? 'bg-green-500/15 text-green-400 border-green-500/30 font-semibold'
+                  : 'text-zinc-500 hover:text-zinc-300 border-transparent hover:bg-zinc-800'
               }`}
             >
               {cat.label}
@@ -117,14 +117,14 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
             <button
               key={block.id}
               onClick={() => onSelectBlockId(block.id)}
-              className={`relative flex flex-col items-center justify-center p-1.5 rounded-lg border transition-all group ${
+              className={`relative flex flex-col items-center justify-center p-1.5 rounded-xl border transition-all group ${
                 isSelected
-                  ? 'border-emerald-400 ring-2 ring-emerald-500/30 bg-emerald-500/10 shadow-md'
-                  : 'border-slate-800 hover:border-slate-700 bg-slate-950/50 hover:bg-slate-950/80'
+                  ? 'border-green-500/35 bg-green-500/15 shadow-sm'
+                  : 'border-zinc-800 hover:border-zinc-700 bg-zinc-950/50 hover:bg-zinc-800'
               }`}
               title={`${block.name}\n${block.id}`}
             >
-              <div className="w-9 h-9 rounded-md bg-slate-900/90 border border-slate-700/60 shadow-inner mb-1 flex items-center justify-center overflow-hidden p-0.5 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-zinc-900/90 border border-zinc-700/60 shadow-inner mb-1 flex items-center justify-center overflow-hidden p-0.5 group-hover:scale-105 transition-transform">
                 <img
                   src={getBlockPreviewThumbnail(block.id, block.defaultState)}
                   alt={block.name}
@@ -133,7 +133,7 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
                   loading="lazy"
                 />
               </div>
-              <span className="text-[9px] text-slate-300 font-medium truncate w-full text-center leading-tight">
+              <span className="text-[9px] text-zinc-300 font-medium truncate w-full text-center leading-tight">
                 {block.name.replace('Minecraft ', '')}
               </span>
 
@@ -162,7 +162,7 @@ export const BlockPaletteSelector: React.FC<BlockPaletteSelectorProps> = ({
         })}
       </div>
 
-      <div className="p-2 border-t border-slate-800 bg-slate-950/40 flex items-center justify-between text-[10px] font-mono text-slate-500">
+      <div className="p-2 border-t border-zinc-800 bg-zinc-950/40 flex items-center justify-between text-[10px] font-mono text-zinc-500">
         <span>{filteredBlocks.length} Blocks</span>
         <span>Version: Java {selectedVersion}</span>
       </div>

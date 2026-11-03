@@ -619,32 +619,37 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col w-screen h-screen overflow-hidden bg-slate-950 font-sans text-slate-100">
-      {/* =================================================================== */}
-      {/* 1. TOP DOCKED HEADER: Project Controls, Version, Actions, Export */}
-      {/* =================================================================== */}
-      <header className="h-13 w-full bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 z-30 select-none flex-shrink-0">
-        {/* Left: Brand & Build Name */}
+    <div className="flex flex-col w-screen h-screen overflow-hidden bg-zinc-950 font-sans text-zinc-100">
+      {/* HEADER */}
+      <header className="h-14 w-full bg-zinc-900/95 backdrop-blur-sm border-b border-zinc-800 flex items-center justify-between px-4 z-30 select-none flex-shrink-0 shadow-sm">
+        {/* Left: Sketch MC Brand */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-              <Boxes className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center gap-2.5">
+            {/* Diamond/Block SVG icon */}
+            <div className="w-8 h-8 rounded-xl bg-green-500/15 border border-green-500/30 flex items-center justify-center flex-shrink-0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-green-400">
+                <path d="M8 1L14 5V11L8 15L2 11V5L8 1Z" stroke="currentColor" strokeWidth="1.5" fill="rgba(74,222,128,0.15)"/>
+                <path d="M8 1L14 5L8 9L2 5L8 1Z" stroke="currentColor" strokeWidth="1" fill="rgba(74,222,128,0.1)"/>
+              </svg>
             </div>
-            <span className="font-bold text-sm tracking-tight text-white font-mono">
-              Voxel<span className="text-emerald-400">Forge</span>
-            </span>
+            <div className="flex flex-col leading-tight">
+              <span className="font-bold text-sm tracking-tight text-white">
+                Sketch<span className="text-green-400">MC</span>
+              </span>
+              <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">AI 3D Builder</span>
+            </div>
           </div>
 
-          <div className="h-4 w-px bg-slate-800 mx-1 hidden sm:block" />
+          <div className="h-5 w-px bg-zinc-800 mx-1 hidden sm:block" />
 
           <div className="hidden sm:flex items-center gap-2">
-            <span className="text-xs font-medium text-slate-300 max-w-[200px] truncate">
+            <span className="text-xs font-medium text-zinc-400 max-w-[180px] truncate">
               {currentBuild.name}
             </span>
             <select
               value={selectedVersion}
               onChange={(e) => setSelectedVersion(e.target.value as '1.20' | '1.21')}
-              className="px-2 py-0.5 text-[11px] font-mono bg-slate-950 border border-slate-700 rounded text-slate-300 focus:outline-none focus:border-emerald-500"
+              className="px-2 py-1 text-[11px] font-mono bg-zinc-950 border border-zinc-700 rounded-lg text-zinc-300 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/20 cursor-pointer"
               title="Target Minecraft Version"
             >
               <option value="1.21">Java 1.21</option>
@@ -653,78 +658,84 @@ export default function App() {
           </div>
         </div>
 
-        {/* Center: Primary Pipeline & Utilities */}
-        <div className="flex items-center gap-2">
+        {/* Center: Primary Actions */}
+        <div className="flex items-center gap-1.5">
+          {/* Reconstruct - primary CTA */}
           <button
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition-colors shadow-sm"
-            title="Upload architectural reference image for 3D Minecraft reconstruction"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-zinc-950 bg-green-400 hover:bg-green-300 active:bg-green-500 rounded-xl transition-all shadow-sm shadow-green-500/20 hover:shadow-green-500/30"
+            title="Upload reference image for 3D reconstruction"
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>Reconstruct Image</span>
+            <span>Reconstruct</span>
           </button>
 
+          <div className="h-5 w-px bg-zinc-800 mx-0.5 hidden md:block" />
+
+          {/* Secondary tools group */}
           <button
             onClick={() => setIsAssistantOpen(!isAssistantOpen)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium rounded-xl border transition-all ${
               isAssistantOpen
-                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-                : 'text-purple-400 hover:text-purple-300 bg-slate-950/60 border-slate-800'
+                ? 'bg-violet-500/15 text-violet-300 border-violet-500/40 shadow-sm shadow-violet-500/10'
+                : 'text-zinc-400 hover:text-zinc-200 bg-zinc-950/60 border-zinc-800 hover:border-zinc-700'
             }`}
-            title="Natural Language Architectural Modification"
+            title="AI Natural Language Editor"
           >
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <Sparkles className="w-3.5 h-3.5 text-violet-400" />
             <span className="hidden md:inline">AI Edit</span>
           </button>
 
           <button
             onClick={() => setIsAnalysisPanelOpen(!isAnalysisPanelOpen)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium rounded-xl border transition-all ${
               isAnalysisPanelOpen
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                : 'text-emerald-400 hover:text-emerald-300 bg-slate-950/60 border-slate-800'
+                ? 'bg-green-500/12 text-green-300 border-green-500/40 shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 bg-zinc-950/60 border-zinc-800 hover:border-zinc-700'
             }`}
-            title="View Reference Architectural Decomposition & Convergence Trace"
+            title="Architectural Analysis"
           >
-            <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+            <Building2 className="w-3.5 h-3.5 text-green-400" />
             <span className="hidden md:inline">Analysis</span>
           </button>
 
           <button
             onClick={() => setIsAICouncilOpen(!isAICouncilOpen)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl border transition-all ${
               isAICouncilOpen
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
-                : 'text-emerald-400 hover:text-emerald-300 bg-slate-950/60 border-slate-800'
+                ? 'bg-green-500/12 text-green-300 border-green-500/40 shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 bg-zinc-950/60 border-zinc-800 hover:border-zinc-700'
             }`}
-            title="Open Hermes Multi-Agent Council (Hermes, GPT, Gemini, Grok)"
+            title="Multi-Agent AI Council"
           >
-            <Bot className="w-3.5 h-3.5 text-emerald-400" />
+            <Bot className="w-3.5 h-3.5 text-green-400" />
             <span className="hidden md:inline">AI Council</span>
           </button>
 
           <button
             onClick={() => setIsVisualDebugOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
-            title="Open Visual Debug & Neutral 3D Model Inspector"
+            className="flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-200 bg-zinc-950/60 hover:bg-zinc-800/60 border border-zinc-800 hover:border-zinc-700 rounded-xl transition-all"
+            title="Visual Debug Inspector"
           >
             <Box className="w-3.5 h-3.5 text-sky-400" />
-            <span className="hidden md:inline">Visual Debug</span>
+            <span className="hidden md:inline">Debug</span>
           </button>
 
           <button
             onClick={() => setIsVersionModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
-            title="Minecraft Version Registry & Immutability Manager"
+            className="flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold text-zinc-400 hover:text-zinc-200 bg-zinc-950/60 hover:bg-zinc-800/60 border border-zinc-800 hover:border-zinc-700 rounded-xl transition-all"
+            title="Minecraft Version Registry"
           >
-            <Database className="w-3.5 h-3.5 text-emerald-400" />
+            <Database className="w-3.5 h-3.5 text-green-400" />
             <span className="hidden md:inline font-mono">v{currentBuild.metadata.minecraftVersion || '1.21.1'}</span>
           </button>
 
+          <div className="h-5 w-px bg-zinc-800 mx-0.5 hidden lg:block" />
+
           <button
             onClick={() => setIsBOMModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
-            title="Calculate Material Requirements & Stacks"
+            className="flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-200 bg-zinc-950/60 hover:bg-zinc-800/60 border border-zinc-800 hover:border-zinc-700 rounded-xl transition-all"
+            title="Bill of Materials"
           >
             <Calculator className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden md:inline">BOM</span>
@@ -732,72 +743,53 @@ export default function App() {
 
           <button
             onClick={() => setIsSchematic2DOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
-            title="View 2D Blueprint Layers"
+            className="flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-200 bg-zinc-950/60 hover:bg-zinc-800/60 border border-zinc-800 hover:border-zinc-700 rounded-xl transition-all"
+            title="2D Blueprint Layers"
           >
             <Layers className="w-3.5 h-3.5 text-sky-400" />
             <span className="hidden md:inline">Blueprint</span>
           </button>
         </div>
 
-        {/* Right: Viewport Shading Modes & Export */}
+        {/* Right: Viewport controls + Export */}
         <div className="flex items-center gap-2">
-          {/* Shading Mode Switcher */}
-          <div className="hidden lg:flex items-center gap-0.5 p-0.5 bg-slate-950 border border-slate-800 rounded-lg">
-            <button
-              onClick={() => setShadingMode('material')}
-              className={`p-1.5 rounded transition-colors ${
-                shadingMode === 'material' ? 'bg-slate-800 text-emerald-400' : 'text-slate-500 hover:text-slate-300'
-              }`}
-              title="Material Mode: Block colors & transparency"
-            >
-              <Palette className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setShadingMode('solid')}
-              className={`p-1.5 rounded transition-colors ${
-                shadingMode === 'solid' ? 'bg-slate-800 text-sky-400' : 'text-slate-500 hover:text-slate-300'
-              }`}
-              title="Solid Mode: Studio clay shading"
-            >
-              <Box className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setShadingMode('wireframe')}
-              className={`p-1.5 rounded transition-colors ${
-                shadingMode === 'wireframe' ? 'bg-slate-800 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
-              }`}
-              title="Wireframe Mode"
-            >
-              <Grid className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setShadingMode('blueprint')}
-              className={`p-1.5 rounded transition-colors ${
-                shadingMode === 'blueprint' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-300'
-              }`}
-              title="Blueprint Mode"
-            >
-              <FileCode2 className="w-3.5 h-3.5" />
-            </button>
+          {/* Shading mode group */}
+          <div className="hidden lg:flex items-center gap-0.5 p-1 bg-zinc-950 border border-zinc-800 rounded-xl">
+            {[
+              { mode: 'material', icon: <Palette className="w-3.5 h-3.5" />, title: 'Material', color: 'text-green-400' },
+              { mode: 'solid', icon: <Box className="w-3.5 h-3.5" />, title: 'Solid', color: 'text-sky-400' },
+              { mode: 'wireframe', icon: <Grid className="w-3.5 h-3.5" />, title: 'Wireframe', color: 'text-cyan-400' },
+              { mode: 'blueprint', icon: <FileCode2 className="w-3.5 h-3.5" />, title: 'Blueprint', color: 'text-indigo-400' },
+            ].map(({ mode, icon, title, color }) => (
+              <button
+                key={mode}
+                onClick={() => setShadingMode(mode as ShadingMode)}
+                className={`p-1.5 rounded-lg transition-all ${
+                  shadingMode === mode
+                    ? `bg-zinc-800 ${color} shadow-sm`
+                    : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+                title={title}
+              >
+                {icon}
+              </button>
+            ))}
           </div>
 
           <button
             onClick={() => setIsExportModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-100 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors shadow-sm"
-            title="Export WorldEdit .schem, Litematica .litematic, or JSON"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-100 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600 rounded-xl transition-all shadow-sm"
+            title="Export .schem, .litematic, or JSON"
           >
-            <FileDown className="w-3.5 h-3.5 text-emerald-400" />
+            <FileDown className="w-3.5 h-3.5 text-green-400" />
             <span>Export</span>
           </button>
         </div>
       </header>
 
-      {/* =================================================================== */}
-      {/* 2. MAIN DOCKED WORKBENCH BODY */}
-      {/* =================================================================== */}
-      <div className="flex flex-row flex-1 w-full h-[calc(100vh-3.25rem)] overflow-hidden relative">
-        {/* LEFT DOCKED CAD TOOLBAR */}
+      {/* MAIN BODY */}
+      <div className="flex flex-row flex-1 w-full h-[calc(100vh-3.5rem)] overflow-hidden relative">
+        {/* LEFT TOOLBAR */}
         <Toolbar
           activeTool={activeTool}
           setActiveTool={setActiveTool}
@@ -807,9 +799,9 @@ export default function App() {
           onRedo={handleRedo}
         />
 
-        {/* CENTER VIEWPORT & SLICER CONTAINER */}
-        <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-950">
-          {/* Main 3D Three.js Viewport */}
+        {/* CENTER: VIEWPORT + BOTTOM BAR */}
+        <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-zinc-950">
+          {/* 3D Viewport */}
           <div className="flex-1 relative w-full h-full overflow-hidden">
             <ThreeViewport
               build={currentBuild}
@@ -827,9 +819,9 @@ export default function App() {
               setHoveredCoords={setHoveredCoords}
             />
 
-            {/* AI Assistant Drawer (when opened) */}
+            {/* AI Assistant Panel */}
             {isAssistantOpen && (
-              <div className="absolute top-3 left-3 z-20 w-80 h-[calc(100%-1.5rem)] shadow-2xl">
+              <div className="absolute top-3 left-3 z-20 w-80 h-[calc(100%-1.5rem)] shadow-2xl shadow-black/50 animate-fade-in">
                 <AIAssistantPanel
                   build={currentBuild}
                   isOpen={isAssistantOpen}
@@ -840,9 +832,9 @@ export default function App() {
               </div>
             )}
 
-            {/* Reconstruction Architectural Analysis Panel (when opened) */}
+            {/* Reconstruction Analysis Panel */}
             {isAnalysisPanelOpen && currentBuild.metadata.referenceBuilding && (
-              <div className="absolute top-3 left-3 z-20 w-84 h-[calc(100%-1.5rem)] shadow-2xl">
+              <div className="absolute top-3 left-3 z-20 w-84 h-[calc(100%-1.5rem)] shadow-2xl shadow-black/50 animate-fade-in">
                 <ReconstructionAnalysisPanel
                   referenceBuilding={currentBuild.metadata.referenceBuilding}
                   iterationHistory={currentBuild.metadata.iterationHistory}
@@ -852,9 +844,9 @@ export default function App() {
               </div>
             )}
 
-            {/* AI Council Workspace Drawer (when opened) */}
+            {/* AI Council Panel */}
             {isAICouncilOpen && (
-              <div className="absolute top-3 right-3 z-30 w-96 h-[calc(100%-1.5rem)] shadow-2xl rounded-lg overflow-hidden border border-slate-700/80">
+              <div className="absolute top-3 right-3 z-30 w-96 h-[calc(100%-1.5rem)] shadow-2xl shadow-black/50 rounded-2xl overflow-hidden border border-zinc-700/60 animate-fade-in">
                 <AICouncilPanel
                   councilReports={councilReports}
                   candidateSolutions={candidateSolutions}
@@ -866,10 +858,10 @@ export default function App() {
             )}
           </div>
 
-          {/* DOCKED BOTTOM BAR: Slicer, Layer Controls & Live Status */}
-          <div className="h-14 border-t border-slate-800 bg-slate-900/95 flex items-center justify-between px-4 z-20 flex-shrink-0 select-none">
-            {/* Left: Layer Slicer Slider */}
-            <div className="flex items-center gap-3">
+          {/* BOTTOM STATUS BAR */}
+          <div className="h-12 border-t border-zinc-800/80 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between px-4 z-20 flex-shrink-0 select-none">
+            {/* Layer Slicer */}
+            <div className="flex items-center">
               <LayerSliceBar
                 maxHeight={maxHeight}
                 currentSlice={currentLayerSlice}
@@ -877,31 +869,31 @@ export default function App() {
               />
             </div>
 
-            {/* Right: Live Build Stats & Navigation Info */}
-            <div className="flex items-center gap-4 text-xs font-mono tabular-nums text-slate-300">
+            {/* Live Stats */}
+            <div className="flex items-center gap-4 text-xs font-mono tabular-nums text-zinc-400">
               <div className="flex items-center gap-1.5">
-                <span className="text-slate-500 text-[11px]">CURSOR:</span>
+                <span className="text-zinc-600 text-[10px] uppercase tracking-wider">Cursor</span>
                 {hoveredCoords ? (
-                  <span className="text-emerald-400 font-semibold">
-                    X:{hoveredCoords.x} Y:{hoveredCoords.y} Z:{hoveredCoords.z}
+                  <span className="text-green-400 font-semibold">
+                    {hoveredCoords.x},{hoveredCoords.y},{hoveredCoords.z}
                   </span>
                 ) : (
-                  <span className="text-slate-500">—</span>
+                  <span className="text-zinc-600">—</span>
                 )}
               </div>
 
-              <div className="h-3.5 w-px bg-slate-800" />
+              <div className="h-3 w-px bg-zinc-800" />
 
               <div className="flex items-center gap-1.5">
-                <span className="text-slate-500 text-[11px]">BLOCKS:</span>
-                <span className="text-slate-200 font-semibold">{currentBuild.blocks.length}</span>
+                <span className="text-zinc-600 text-[10px] uppercase tracking-wider">Blocks</span>
+                <span className="text-zinc-200 font-semibold">{currentBuild.blocks.length.toLocaleString()}</span>
               </div>
 
-              <div className="h-3.5 w-px bg-slate-800 hidden sm:block" />
+              <div className="h-3 w-px bg-zinc-800 hidden sm:block" />
 
               <div className="hidden sm:flex items-center gap-1.5">
-                <span className="text-slate-500 text-[11px]">BOUNDS:</span>
-                <span className="text-slate-400">
+                <span className="text-zinc-600 text-[10px] uppercase tracking-wider">Bounds</span>
+                <span className="text-zinc-400">
                   {currentBuild.dimensions.width}×{currentBuild.dimensions.height}×{currentBuild.dimensions.depth}
                 </span>
               </div>
@@ -909,16 +901,16 @@ export default function App() {
           </div>
         </div>
 
-        {/* RIGHT DOCKED SIDEBAR: Block Palette & Block State Inspector */}
-        <div className="w-80 h-full border-l border-slate-800 bg-slate-900 flex flex-col z-20 flex-shrink-0 overflow-hidden">
-          {/* Right Panel Tab Switcher */}
-          <div className="flex items-center border-b border-slate-800 bg-slate-950/60 p-1 flex-shrink-0">
+        {/* RIGHT SIDEBAR */}
+        <div className="w-80 h-full border-l border-zinc-800 bg-zinc-900 flex flex-col z-20 flex-shrink-0 overflow-hidden">
+          {/* Tab Switcher */}
+          <div className="flex items-center p-2 border-b border-zinc-800 bg-zinc-950/50 flex-shrink-0 gap-1">
             <button
               onClick={() => setRightPanelTab('palette')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition-colors ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all ${
                 rightPanelTab === 'palette'
-                  ? 'bg-slate-800 text-emerald-400 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-zinc-800 text-green-400 shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/40'
               }`}
             >
               <Boxes className="w-3.5 h-3.5" />
@@ -926,10 +918,10 @@ export default function App() {
             </button>
             <button
               onClick={() => setRightPanelTab('inspector')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition-colors ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all ${
                 rightPanelTab === 'inspector'
-                  ? 'bg-slate-800 text-cyan-400 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-zinc-800 text-cyan-400 shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/40'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -954,8 +946,8 @@ export default function App() {
             )}
           </div>
 
-          {/* Bottom Architectural Confidence / Quality HUD */}
-          <div className="border-t border-slate-800 p-2 bg-slate-950/50 flex-shrink-0">
+          {/* Confidence HUD */}
+          <div className="border-t border-zinc-800 p-2 bg-zinc-950/40 flex-shrink-0">
             <ConfidenceHUD
               confidence={currentBuild.metadata.confidence}
               onReconstructRegion={(r) => handleApplyPromptEdit(`Re-optimize ${r} architecture`)}
@@ -965,9 +957,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* =================================================================== */}
-      {/* 3. MODALS & OVERLAYS */}
-      {/* =================================================================== */}
+      {/* MODALS */}
       <ImageUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
@@ -976,26 +966,22 @@ export default function App() {
         processingStep={processingStep}
         processingProgress={processingProgress}
       />
-
       <MaterialBOMModal
         isOpen={isBOMModalOpen}
         onClose={() => setIsBOMModalOpen(false)}
         build={currentBuild}
       />
-
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         build={currentBuild}
       />
-
       <Schematic2DModal
         isOpen={isSchematic2DOpen}
         onClose={() => setIsSchematic2DOpen(false)}
         build={currentBuild}
         initialY={currentLayerSlice}
       />
-
       <VisualDebugModal
         isOpen={isVisualDebugOpen}
         onClose={() => setIsVisualDebugOpen(false)}
@@ -1006,7 +992,6 @@ export default function App() {
         candidateSolutions={candidateSolutions}
         observations={councilReports[0]?.observations || []}
       />
-
       <MinecraftVersionModal
         isOpen={isVersionModalOpen}
         onClose={() => setIsVersionModalOpen(false)}

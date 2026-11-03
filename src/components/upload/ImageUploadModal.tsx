@@ -185,23 +185,23 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="flex flex-col w-full max-w-3xl max-h-[92vh] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl">
+      <div className="flex flex-col w-full max-w-3xl max-h-[92vh] bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden text-zinc-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950/60">
           <div>
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <Camera className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+              <Camera className="w-4 h-4 text-green-400" />
               <span>Reference-First Minecraft 3D Reconstruction</span>
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-zinc-400">
               Upload single or multi-angle references. Architecture, arches, and proportions are strictly reconstructed from your photos.
             </p>
           </div>
           {!isProcessing && (
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -214,33 +214,33 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
             /* Multi-stage Progress Pipeline */
             <div className="flex flex-col items-center justify-center py-12 space-y-6 text-center">
               <div className="relative flex items-center justify-center w-20 h-20">
-                <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20 animate-ping" />
-                <div className="w-16 h-16 rounded-full border-4 border-emerald-400 border-t-transparent animate-spin" />
-                <Sparkles className="w-6 h-6 text-emerald-400 absolute" />
+                <div className="absolute inset-0 rounded-full border-4 border-green-500/20 animate-ping" />
+                <div className="w-16 h-16 rounded-full border-4 border-green-400 border-t-transparent animate-spin" />
+                <Sparkles className="w-6 h-6 text-green-400 absolute" />
               </div>
 
               <div className="space-y-1.5 max-w-md">
-                <h4 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">
+                <h4 className="text-sm font-bold text-zinc-100 uppercase tracking-wider font-mono">
                   {processingStep}
                 </h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-zinc-400">
                   Executing iterative render-vs-reference calibration across silhouette, bays, and stepped arches...
                 </p>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full max-w-md bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 shadow-inner">
+              <div className="w-full max-w-md bg-zinc-950 rounded-full h-2.5 overflow-hidden border border-zinc-800 shadow-inner">
                 <div
-                  className="bg-emerald-400 h-full transition-all duration-300"
+                  className="bg-green-400 h-full transition-all duration-300"
                   style={{ width: `${processingProgress}%` }}
                 />
               </div>
 
-              <div className="grid grid-cols-4 gap-2 w-full max-w-md text-[10px] font-mono text-slate-500 text-center">
-                <div className={processingProgress >= 20 ? 'text-emerald-400 font-bold' : ''}>1. Vision / Bays</div>
-                <div className={processingProgress >= 45 ? 'text-emerald-400 font-bold' : ''}>2. 3D Proxy</div>
-                <div className={processingProgress >= 70 ? 'text-emerald-400 font-bold' : ''}>3. Voxel Grid</div>
-                <div className={processingProgress >= 90 ? 'text-emerald-400 font-bold' : ''}>4. Calibration</div>
+              <div className="grid grid-cols-4 gap-2 w-full max-w-md text-[10px] font-mono text-zinc-500 text-center">
+                <div className={processingProgress >= 20 ? 'text-green-400 font-bold' : ''}>1. Vision / Bays</div>
+                <div className={processingProgress >= 45 ? 'text-green-400 font-bold' : ''}>2. 3D Proxy</div>
+                <div className={processingProgress >= 70 ? 'text-green-400 font-bold' : ''}>3. Voxel Grid</div>
+                <div className={processingProgress >= 90 ? 'text-green-400 font-bold' : ''}>4. Calibration</div>
               </div>
             </div>
           ) : (
@@ -248,9 +248,9 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
               {/* Reference Manager: Multi-Image Ingestion */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
                     <span>1. REFERENCE MANAGER (SINGLE OR MULTI-IMAGE)</span>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                    <span className="text-[10px] font-mono text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/30">
                       {images.length} {images.length === 1 ? 'Image' : 'Images'}
                     </span>
                   </label>
@@ -259,7 +259,7 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+                      className="flex items-center gap-1 text-[11px] font-semibold text-green-400 hover:text-green-300 transition-colors"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Add More Views</span>
@@ -274,12 +274,12 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`relative flex flex-col items-center justify-center p-5 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                  className={`relative flex flex-col items-center justify-center p-5 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
                     dragActive
-                      ? 'border-emerald-400 bg-emerald-500/10'
+                      ? 'border-green-400/70 bg-green-500/8'
                       : images.length > 0
-                      ? 'border-slate-800 bg-slate-950/40 hover:border-slate-700'
-                      : 'border-slate-800 hover:border-slate-600 bg-slate-950/50'
+                      ? 'border-zinc-800 bg-zinc-950/40 hover:border-zinc-700'
+                      : 'border-zinc-800 hover:border-zinc-600 bg-zinc-950/50'
                   }`}
                 >
                   <input
@@ -293,19 +293,19 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
                   {images.length === 0 ? (
                     <div className="flex flex-col items-center text-center space-y-2 py-3">
-                      <div className="p-3 rounded-full bg-slate-800/80 text-emerald-400 shadow-md">
+                      <div className="p-3 rounded-full bg-zinc-800/80 text-green-400 shadow-md">
                         <Upload className="w-6 h-6" />
                       </div>
-                      <div className="text-xs text-slate-300">
-                        <span className="font-semibold text-emerald-400">Click to upload</span> or drag and drop reference images
+                      <div className="text-xs text-zinc-300">
+                        <span className="font-semibold text-green-400">Click to upload</span> or drag and drop reference images
                       </div>
-                      <span className="text-[10px] text-slate-500 font-mono">
+                      <span className="text-[10px] text-zinc-500 font-mono">
                         Front, Back, Left, Right, Interior, Roof, or Details (JPG, PNG, WEBP)
                       </span>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center gap-2 text-xs text-slate-400 py-1">
-                      <Plus className="w-4 h-4 text-emerald-400" />
+                    <div className="flex items-center justify-center gap-2 text-xs text-zinc-400 py-1">
+                      <Plus className="w-4 h-4 text-green-400" />
                       <span>Drag more photos here or click to add additional perspectives</span>
                     </div>
                   )}
@@ -326,16 +326,16 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                       return (
                         <div
                           key={img.id}
-                          className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-sm"
+                          className="flex items-center gap-3 p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800 shadow-sm"
                         >
                           <img
                             src={img.dataUrl}
                             alt={img.name}
-                            className="w-16 h-16 object-cover rounded-lg border border-slate-700/80 shrink-0"
+                            className="w-16 h-16 object-cover rounded-lg border border-zinc-700/80 shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-semibold text-slate-200 truncate">
+                              <span className="text-xs font-semibold text-zinc-200 truncate">
                                 Ref {idx + 1}: {img.name}
                               </span>
                               <button
@@ -344,7 +344,7 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                                   e.stopPropagation();
                                   handleRemoveImage(img.id);
                                 }}
-                                className="text-slate-500 hover:text-rose-400 transition-colors p-1"
+                                className="text-zinc-500 hover:text-rose-400 transition-colors p-1"
                                 title="Remove photo"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -358,7 +358,7 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                                 onChange={(e) =>
                                   handleReclassifyView(img.id, e.target.value as ReferenceViewType)
                                 }
-                                className="px-2 py-0.5 text-[11px] font-mono bg-slate-900 border border-slate-700 rounded text-emerald-300 focus:outline-none focus:border-emerald-500 capitalize"
+                                className="px-2 py-0.5 text-[11px] font-mono bg-zinc-950 border border-zinc-800 rounded-xl text-green-300 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/15 cursor-pointer capitalize"
                               >
                                 {viewOptions.map((v) => (
                                   <option key={v} value={v}>
@@ -367,7 +367,7 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                                 ))}
                               </select>
 
-                              <span className="text-[10px] font-mono text-slate-400">
+                              <span className="text-[10px] font-mono text-zinc-400">
                                 {Math.round(img.confidence * 100)}% match
                               </span>
                             </div>
@@ -382,7 +382,7 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
               {/* Starter Archetypes (Option B) */}
               {images.length === 0 && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">
                     Option B: Or Select a Starter Archetype
                   </label>
                   <div className="grid grid-cols-3 gap-2.5">
@@ -395,17 +395,17 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                           onClick={() => handleSelectPreset(preset.id)}
                           className={`flex flex-col text-left p-3 rounded-xl border transition-all ${
                             isSelected
-                              ? 'bg-emerald-500/10 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/30'
-                              : 'bg-slate-950/40 border-slate-800/80 hover:border-slate-700 hover:bg-slate-950/70'
+                              ? 'bg-green-500/10 border-green-500/40 shadow-md ring-1 ring-green-500/20'
+                              : 'bg-zinc-950/40 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-950/70'
                           }`}
                         >
                           <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border mb-1 w-fit ${preset.badgeColor}`}>
                             {preset.category}
                           </span>
-                          <span className="text-xs font-bold text-slate-200 line-clamp-1">
+                          <span className="text-xs font-bold text-zinc-200 line-clamp-1">
                             {preset.name}
                           </span>
-                          <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">
+                          <p className="text-[10px] text-zinc-400 mt-1 line-clamp-2">
                             {preset.description}
                           </p>
                         </button>
@@ -415,11 +415,11 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                 </div>
               )}
 
-              {/* Reconstruction Settings Panel (Requirement 27) */}
-              <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5 uppercase font-mono tracking-wider">
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-400" />
+              {/* Reconstruction Settings Panel */}
+              <div className="p-4 rounded-2xl bg-zinc-950/70 border border-zinc-800 space-y-4">
+                <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                  <span className="text-xs font-bold text-zinc-200 flex items-center gap-1.5 uppercase font-mono tracking-wider">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-green-400" />
                     <span>2. RECONSTRUCTION PARAMETERS</span>
                   </span>
                 </div>
@@ -427,13 +427,13 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {/* Build Scale */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    <label className="block text-[11px] font-semibold text-zinc-400 mb-1">
                       BUILD SCALE
                     </label>
                     <select
                       value={buildScale}
                       onChange={(e) => setBuildScale(e.target.value as BuildScaleOption)}
-                      className="w-full p-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg text-slate-200 font-mono"
+                      className="w-full p-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 font-mono focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/15 cursor-pointer"
                     >
                       <option value="small">Small (0.75x)</option>
                       <option value="medium">Medium (1:1 Realistic)</option>
@@ -444,13 +444,13 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
                   {/* Reference Mode */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    <label className="block text-[11px] font-semibold text-zinc-400 mb-1">
                       REFERENCE MODE
                     </label>
                     <select
                       value={referenceMode}
                       onChange={(e) => setReferenceMode(e.target.value as ReferenceModeOption)}
-                      className="w-full p-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg text-slate-200 font-mono"
+                      className="w-full p-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 font-mono focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/15 cursor-pointer"
                     >
                       <option value="architecture_environment">Architecture + Environment</option>
                       <option value="architecture_only">Architecture Only</option>
@@ -460,13 +460,13 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
                   {/* Accuracy */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    <label className="block text-[11px] font-semibold text-zinc-400 mb-1">
                       ACCURACY
                     </label>
                     <select
                       value={accuracy}
                       onChange={(e) => setAccuracy(e.target.value as AccuracyOption)}
-                      className="w-full p-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg text-slate-200 font-mono"
+                      className="w-full p-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 font-mono focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/15 cursor-pointer"
                     >
                       <option value="high_detail">High Detail</option>
                       <option value="balanced">Balanced</option>
@@ -476,13 +476,13 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
                   {/* Hidden Inference */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    <label className="block text-[11px] font-semibold text-zinc-400 mb-1">
                       HIDDEN SIDES INFERENCE
                     </label>
                     <select
                       value={inference}
                       onChange={(e) => setInference(e.target.value as InferenceOption)}
-                      className="w-full p-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg text-slate-200 font-mono"
+                      className="w-full p-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 font-mono focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/15 cursor-pointer"
                     >
                       <option value="conservative">Conservative (Symmetry-first)</option>
                       <option value="balanced">Balanced</option>
@@ -492,20 +492,20 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                 </div>
 
                 {/* Minecraft Target Version */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                <div className="flex items-center justify-between pt-2 border-t border-zinc-800/80">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-slate-300 font-mono">TARGET VERSION:</span>
+                    <span className="text-xs font-semibold text-zinc-300 font-mono">TARGET VERSION:</span>
                     <select
                       value={minecraftVersion}
                       onChange={(e) => setMinecraftVersion(e.target.value as '1.20' | '1.21')}
-                      className="px-2.5 py-1 text-xs bg-slate-900 border border-slate-800 rounded-lg text-slate-200 font-mono"
+                      className="px-2.5 py-1 text-xs bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 font-mono focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/15 cursor-pointer"
                     >
                       <option value="1.21">Java 1.21 (Copper Doors, Tuff Bricks, Grates)</option>
                       <option value="1.20">Java 1.20 (Trails & Tales, Cherry, Bamboo)</option>
                     </select>
                   </div>
 
-                  <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">
+                  <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
                     Version strictly enforces asset registry & valid blocks
                   </span>
                 </div>
@@ -516,17 +516,17 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
         {/* Footer */}
         {!isProcessing && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-slate-950/50">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-zinc-800 bg-zinc-950/40">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors"
+              className="px-4 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleStart}
               disabled={images.length === 0 && !selectedPresetId}
-              className="flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-30 disabled:hover:bg-emerald-400 rounded-xl transition-all shadow-lg shadow-emerald-500/20"
+              className="flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-zinc-950 bg-green-400 hover:bg-green-300 disabled:opacity-30 disabled:hover:bg-green-400 rounded-xl transition-all shadow-lg shadow-green-500/20"
             >
               <span>Reconstruct Building Architecture</span>
               <ArrowRight className="w-4 h-4" />

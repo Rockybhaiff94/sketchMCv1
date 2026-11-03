@@ -93,45 +93,45 @@ export const Schematic2DModal: React.FC<Schematic2DModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="flex flex-col w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl">
+      <div className="flex flex-col w-full max-w-3xl max-h-[90vh] bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden text-zinc-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950/60">
           <div className="flex items-center gap-2">
             <Layers className="w-5 h-5 text-sky-400" />
             <div>
-              <h3 className="text-base font-bold text-slate-100">2D Blueprint Slices</h3>
-              <p className="text-xs text-slate-400">Step-by-step layer construction schematic</p>
+              <h3 className="text-base font-bold text-zinc-100">2D Blueprint Slices</h3>
+              <p className="text-xs text-zinc-400">Step-by-step layer construction schematic</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Layer Controls Bar */}
-        <div className="flex items-center justify-between px-6 py-3 bg-slate-950/60 border-b border-slate-800">
+        <div className="flex items-center justify-between px-6 py-3 bg-zinc-950/60 border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSelectedY(Math.max(minY, selectedY - 1))}
               disabled={selectedY <= minY}
-              className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white disabled:opacity-30"
+              className="p-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white disabled:opacity-30 transition-colors"
               title="Previous Layer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <span className="font-mono text-sm font-bold text-emerald-400 min-w-[90px] text-center">
+            <span className="font-mono text-sm font-bold text-green-400 min-w-[90px] text-center">
               Layer Y = {selectedY}
             </span>
 
             <button
               onClick={() => setSelectedY(Math.min(maxY, selectedY + 1))}
               disabled={selectedY >= maxY}
-              className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white disabled:opacity-30"
+              className="p-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white disabled:opacity-30 transition-colors"
               title="Next Layer"
             >
               <ChevronRight className="w-4 h-4" />
@@ -139,12 +139,12 @@ export const Schematic2DModal: React.FC<Schematic2DModalProps> = ({
           </div>
 
           <div className="flex items-center gap-4 text-xs font-mono">
-            <span className="text-slate-400">
-              Blocks in Layer: <strong className="text-slate-200">{layerBlocks.length}</strong>
+            <span className="text-zinc-400">
+              Blocks in Layer: <strong className="text-zinc-200">{layerBlocks.length}</strong>
             </span>
             <button
               onClick={exportLayerPNG}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 rounded-xl transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Layer PNG</span>
@@ -153,8 +153,8 @@ export const Schematic2DModal: React.FC<Schematic2DModalProps> = ({
         </div>
 
         {/* 2D Voxel Grid Canvas */}
-        <div className="flex-1 overflow-auto p-6 bg-slate-950/80 flex items-center justify-center min-h-[340px]">
-          <div className="inline-block border border-slate-800/80 bg-slate-900/50 p-4 rounded-xl shadow-inner">
+        <div className="flex-1 overflow-auto p-6 bg-zinc-950/80 flex items-center justify-center min-h-[340px]">
+          <div className="inline-block border border-zinc-800/80 bg-zinc-900/50 p-4 rounded-xl shadow-inner">
             <div className="flex flex-col gap-1">
               {Array.from({ length: maxZ - minZ + 1 }).map((_, rIdx) => {
                 const z = minZ + rIdx;
@@ -172,8 +172,8 @@ export const Schematic2DModal: React.FC<Schematic2DModalProps> = ({
                           onMouseLeave={() => setHoveredCell(null)}
                           className={`w-6 h-6 rounded-sm border flex items-center justify-center transition-all ${
                             block
-                              ? 'border-white/20 shadow-sm cursor-pointer hover:ring-2 hover:ring-emerald-400'
-                              : 'border-slate-800/40 bg-slate-950/20'
+                              ? 'border-white/20 shadow-sm cursor-pointer hover:ring-2 hover:ring-green-400'
+                              : 'border-zinc-800/40 bg-zinc-950/20'
                           }`}
                           style={{
                             backgroundColor: def ? def.colorHex : 'transparent',
@@ -201,9 +201,9 @@ export const Schematic2DModal: React.FC<Schematic2DModalProps> = ({
         </div>
 
         {/* Bottom Legend & Inspector */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs">
+        <div className="px-6 py-3 border-t border-zinc-800 bg-zinc-950/60 flex items-center justify-between text-xs">
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
-            <span className="text-slate-500 font-mono">LEGEND:</span>
+            <span className="text-zinc-500 font-mono">LEGEND:</span>
             {Array.from(uniqueInLayer.entries()).map(([blockId, count]) => {
               const def = getMinecraftBlock(blockId);
               return (
@@ -212,7 +212,7 @@ export const Schematic2DModal: React.FC<Schematic2DModalProps> = ({
                     className="w-3.5 h-3.5 rounded-sm border border-white/20"
                     style={{ backgroundColor: def?.colorHex || '#888' }}
                   />
-                  <span className="text-slate-300 font-medium">
+                  <span className="text-zinc-300 font-medium">
                     {def?.name || blockId.replace('minecraft:', '')} ({count})
                   </span>
                 </div>
@@ -220,20 +220,20 @@ export const Schematic2DModal: React.FC<Schematic2DModalProps> = ({
             })}
           </div>
 
-          <div className="font-mono text-xs text-slate-400 shrink-0 ml-4">
+          <div className="font-mono text-xs text-zinc-400 shrink-0 ml-4">
             {hoveredCell ? (
               <span>
                 X: {hoveredCell.x} Z: {hoveredCell.z}{' '}
                 {hoveredCell.block ? (
-                  <strong className="text-emerald-400">
+                  <strong className="text-green-400">
                     [{hoveredCell.block.blockId.replace('minecraft:', '')}]
                   </strong>
                 ) : (
-                  <span className="text-slate-600">[Air]</span>
+                  <span className="text-zinc-600">[Air]</span>
                 )}
               </span>
             ) : (
-              <span className="text-slate-600">Hover cell to inspect</span>
+              <span className="text-zinc-600">Hover cell to inspect</span>
             )}
           </div>
         </div>

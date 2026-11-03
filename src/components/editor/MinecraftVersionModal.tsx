@@ -213,22 +213,22 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xl p-4">
+      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden text-zinc-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950/60">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <div className="p-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400">
               <Database className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                 Minecraft Version Registry
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-950 text-green-300 border border-green-800/60">
                   Immutable Snapshots
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400">
                 Multi-version catalog, deterministic blockstates, and non-destructive project migration
               </p>
             </div>
@@ -237,7 +237,7 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
             <button
               onClick={handleSyncAll}
               disabled={syncing}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
               title="Sync with Upstream Adapters"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
@@ -245,7 +245,7 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -253,26 +253,26 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
         </div>
 
         {/* Project Pinning Info Banner */}
-        <div className="px-6 py-3 bg-slate-950/40 border-b border-slate-800/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="px-6 py-3 bg-zinc-950/40 border-b border-zinc-800/60 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span className="text-slate-400">Active Project Pinned Version:</span>
-            <span className="font-mono font-semibold text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/50">
+            <ShieldCheck className="w-4 h-4 text-green-400" />
+            <span className="text-zinc-400">Active Project Pinned Version:</span>
+            <span className="font-mono font-semibold text-green-300 bg-green-950/80 px-2 py-0.5 rounded border border-green-800/50">
               Minecraft {pinnedVersion} (Java)
             </span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
+          <div className="flex items-center gap-4 text-zinc-400 font-mono text-[11px]">
             <div>
-              Snapshot: <span className="text-slate-300">{pinnedSnapshot.slice(0, 16)}...</span>
+              Snapshot: <span className="text-zinc-300">{pinnedSnapshot.slice(0, 16)}...</span>
             </div>
             <div>
-              Schema: <span className="text-slate-300">v{schemaVersion}</span>
+              Schema: <span className="text-zinc-300">v{schemaVersion}</span>
             </div>
           </div>
         </div>
 
         {errorMsg && (
-          <div className="mx-6 mt-4 p-3 rounded-lg bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2">
+          <div className="mx-6 mt-4 p-3 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
             <span>{errorMsg}</span>
           </div>
@@ -282,7 +282,7 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Migration Preview Panel (if active) */}
           {selectedForMigration && migrationReport && (
-            <div className="p-4 rounded-xl bg-slate-950 border border-amber-500/30 space-y-3">
+            <div className="p-4 rounded-xl bg-zinc-950 border border-amber-500/30 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-semibold text-amber-300">
                   <ArrowRight className="w-4 h-4" />
@@ -293,27 +293,27 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                     setSelectedForMigration(null);
                     setMigrationReport(null);
                   }}
-                  className="text-xs text-slate-400 hover:text-white"
+                  className="text-xs text-zinc-400 hover:text-zinc-200"
                 >
                   Cancel
                 </button>
               </div>
 
               <div className="grid grid-cols-3 gap-3 text-xs">
-                <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-slate-400">Differences Detected</div>
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <div className="text-zinc-400">Differences Detected</div>
                   <div className="text-base font-bold text-white mt-0.5">
                     {migrationReport.differences.length}
                   </div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-slate-400">Requires Manual Review</div>
-                  <div className={`text-base font-bold mt-0.5 ${migrationReport.requiresManualReview ? 'text-rose-400' : 'text-emerald-400'}`}>
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <div className="text-zinc-400">Requires Manual Review</div>
+                  <div className={`text-base font-bold mt-0.5 ${migrationReport.requiresManualReview ? 'text-rose-400' : 'text-green-400'}`}>
                     {migrationReport.requiresManualReview ? 'Yes (Breaking)' : 'No (Safe)'}
                   </div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-slate-400">Auto Mappings Available</div>
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <div className="text-zinc-400">Auto Mappings Available</div>
                   <div className="text-base font-bold text-cyan-400 mt-0.5">
                     {migrationReport.differences.filter((d) => d.automaticMappingAvailable).length}
                   </div>
@@ -324,16 +324,16 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                 {migrationReport.differences.map((diff, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded bg-slate-900/60 border border-slate-800/80"
+                    className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80"
                   >
-                    <span className="font-mono text-slate-300">{diff.oldBlockId}</span>
+                    <span className="font-mono text-zinc-300">{diff.oldBlockId}</span>
                     <span
                       className={`px-1.5 py-0.5 rounded text-[10px] font-medium uppercase ${
                         diff.severity === 'breaking'
                           ? 'bg-rose-950 text-rose-300'
                           : diff.severity === 'warning'
                           ? 'bg-amber-950 text-amber-300'
-                          : 'bg-slate-800 text-slate-300'
+                          : 'bg-zinc-800 text-zinc-300'
                       }`}
                     >
                       {diff.type}
@@ -342,20 +342,20 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                 ))}
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800">
                 <button
                   onClick={() => {
                     setSelectedForMigration(null);
                     setMigrationReport(null);
                   }}
-                  className="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
+                  className="px-3 py-1.5 text-xs rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
                 >
                   Dismiss
                 </button>
                 <button
                   onClick={handleConfirmMigration}
                   disabled={migrating}
-                  className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-900/40"
+                  className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-xl bg-green-400 hover:bg-green-300 text-zinc-950 shadow-lg shadow-green-900/40"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{migrating ? 'Migrating Build...' : 'Execute Project Migration'}</span>
@@ -366,21 +366,21 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
 
           {/* Versions Table */}
           <div className="space-y-2">
-            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
               Installed & Upstream Minecraft Snapshots
             </h3>
 
             {loading ? (
-              <div className="p-8 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
-                <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+              <div className="p-8 text-center text-zinc-400 text-xs flex items-center justify-center gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin text-green-400" />
                 <span>Loading Minecraft version snapshots...</span>
               </div>
             ) : versions.length === 0 ? (
-              <div className="p-6 text-center text-slate-400 text-xs">
+              <div className="p-6 text-center text-zinc-400 text-xs">
                 No versions detected. Click 'Sync Sources' to discover upstream releases.
               </div>
             ) : (
-              <div className="divide-y divide-slate-800/80 rounded-xl border border-slate-800 bg-slate-950/40 overflow-hidden">
+              <div className="divide-y divide-zinc-800/80 rounded-xl border border-zinc-800 bg-zinc-950/40 overflow-hidden">
                 {versions.map((ver) => {
                   const isCurrent = ver.version === pinnedVersion;
                   const isReady = ver.status === 'READY';
@@ -391,7 +391,7 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                     <div
                       key={ver.version}
                       className={`flex items-center justify-between p-3.5 transition ${
-                        isCurrent ? 'bg-emerald-950/20' : 'hover:bg-slate-900/50'
+                        isCurrent ? 'bg-green-950/20' : 'hover:bg-zinc-900/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -400,25 +400,25 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                             <span className="font-semibold text-white text-sm">
                               Minecraft {ver.version}
                             </span>
-                            <span className="text-[10px] font-medium uppercase px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
+                            <span className="text-[10px] font-medium uppercase px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400">
                               {ver.edition}
                             </span>
                             {isCurrent && (
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-500/20 text-green-300 border border-green-500/30">
                                 Current Project
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                          <div className="flex items-center gap-3 text-xs text-zinc-400 mt-1">
                             {ver.blockCount && (
                               <span>{ver.blockCount} blocks</span>
                             )}
                             {ver.checksum && (
-                              <span className="font-mono text-[11px] text-slate-500">
+                              <span className="font-mono text-[11px] text-zinc-500">
                                 {ver.checksum.slice(0, 14)}...
                               </span>
                             )}
-                            <span className="text-slate-500">
+                            <span className="text-zinc-500">
                               Sources: {ver.sourceAdapters.join(', ')}
                             </span>
                           </div>
@@ -428,7 +428,7 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                       <div className="flex items-center gap-3">
                         {/* Status Badge */}
                         {isReady && (
-                          <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-800/60">
+                          <div className="flex items-center gap-1.5 text-xs text-green-400 bg-green-950/60 px-2.5 py-1 rounded-full border border-green-800/60">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>READY</span>
                           </div>
@@ -451,7 +451,7 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                           <button
                             onClick={() => handleRequestMigrationPreview(ver.version)}
                             disabled={migrating}
-                            className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                            className="px-2.5 py-1 text-xs font-medium rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
                           >
                             Migrate Here
                           </button>
@@ -461,7 +461,7 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
                           <button
                             onClick={() => handleImportVersion(ver.version)}
                             disabled={syncing}
-                            className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition"
+                            className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-xl bg-green-400 hover:bg-green-300 text-zinc-950 transition"
                           >
                             <DownloadCloud className="w-3.5 h-3.5" />
                             <span>Import</span>
@@ -477,14 +477,14 @@ export const MinecraftVersionModal: React.FC<MinecraftVersionModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-xs text-slate-400">
+        <div className="px-6 py-3.5 border-t border-zinc-800 bg-zinc-950/40 flex items-center justify-between text-xs text-zinc-400">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span className="w-2 h-2 rounded-full bg-green-400"></span>
             <span>All snapshots are immutable and preserved permanently.</span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition"
+            className="px-4 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition"
           >
             Close
           </button>

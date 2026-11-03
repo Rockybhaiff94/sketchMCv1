@@ -44,55 +44,61 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   ];
 
   return (
-    <div className="w-14 h-full flex flex-col items-center py-2 px-1 bg-slate-900 border-r border-slate-800 text-slate-300 z-20 flex-shrink-0 select-none">
-      {/* Primary CAD / Block Tools */}
-      <div className="flex flex-col items-center gap-1.5 w-full">
+    <div className="w-14 h-full flex flex-col items-center py-3 px-1.5 bg-zinc-900 border-r border-zinc-800 z-20 flex-shrink-0 select-none gap-0.5">
+      {/* Tool buttons */}
+      <div className="flex flex-col items-center gap-1 w-full">
         {tools.map((tool) => {
           const isActive = activeTool === tool.id;
           return (
             <button
               key={tool.id}
               onClick={() => setActiveTool(tool.id)}
-              className={`relative group w-10 h-10 flex flex-col items-center justify-center rounded-lg transition-all ${
+              className={`relative group w-10 h-10 flex flex-col items-center justify-center rounded-xl transition-all duration-150 ${
                 isActive
-                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-lg shadow-emerald-500/20'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/40 shadow-sm shadow-green-500/10'
+                  : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 border border-transparent'
               }`}
               title={`${tool.label} (${tool.shortcut})`}
             >
               {tool.icon}
-              <span className={`text-[8px] font-mono leading-none mt-0.5 ${isActive ? 'text-slate-900' : 'text-slate-500'}`}>
+              <span className={`text-[8px] font-mono leading-none mt-0.5 ${isActive ? 'text-green-400' : 'text-zinc-600'}`}>
                 {tool.label}
               </span>
-
-              {/* Tooltip on Hover */}
-              <div className="absolute left-12 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-mono text-slate-200 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
-                {tool.label} ({tool.shortcut})
+              {/* Tooltip */}
+              <div className="absolute left-12 px-2.5 py-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-xs font-medium text-zinc-200 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl shadow-black/50">
+                {tool.label}
+                <span className="ml-1.5 text-zinc-500 font-mono">{tool.shortcut}</span>
               </div>
             </button>
           );
         })}
       </div>
 
-      <div className="w-8 h-px bg-slate-800 my-2" />
+      <div className="w-6 h-px bg-zinc-800 my-2" />
 
-      {/* Undo & Redo Quick Buttons */}
-      <div className="flex flex-col items-center gap-1.5 w-full mt-auto">
+      {/* Undo/Redo */}
+      <div className="flex flex-col items-center gap-1 w-full mt-auto">
         <button
           onClick={onUndo}
           disabled={!canUndo}
-          className="w-10 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-25 disabled:hover:bg-transparent transition-colors"
+          className="relative group w-10 h-9 flex items-center justify-center rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 border border-transparent disabled:opacity-20 disabled:cursor-not-allowed transition-all"
           title="Undo (Ctrl+Z)"
         >
           <Undo2 className="w-4 h-4" />
+          <div className="absolute left-12 px-2.5 py-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-xs font-medium text-zinc-200 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
+            Undo <span className="text-zinc-500">Ctrl+Z</span>
+          </div>
         </button>
         <button
           onClick={onRedo}
           disabled={!canRedo}
-          className="w-10 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-25 disabled:hover:bg-transparent transition-colors"
+          className="relative group w-10 h-9 flex items-center justify-center rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 border border-transparent disabled:opacity-20 disabled:cursor-not-allowed transition-all"
           title="Redo (Ctrl+Y)"
         >
           <Redo2 className="w-4 h-4" />
+          <div className="absolute left-12 px-2.5 py-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-xs font-medium text-zinc-200 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
+            Redo <span className="text-zinc-500">Ctrl+Y</span>
+          </div>
         </button>
       </div>
     </div>
